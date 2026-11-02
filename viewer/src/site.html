@@ -5,11 +5,13 @@
 <title>step2torque viewer</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font:13px system-ui;color:#263244;background:white;height:100dvh;display:flex;flex-direction:column}header{min-height:48px;display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid #e5e9ee;flex-wrap:wrap;flex-shrink:0}select,.open{font:inherit;color:inherit;background:white;border:1px solid #d6dce3;border-radius:5px;padding:5px 8px;min-height:30px}.open{cursor:pointer;position:relative;overflow:hidden}.open:focus-within,select:focus-visible{outline:2px solid #417fc5;outline-offset:2px}.open input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}label{display:flex;align-items:center;gap:8px}output{color:#697586;overflow-wrap:anywhere}iframe{display:block;border:0;width:100%;flex:1;min-height:0}@media(max-width:600px){header{gap:8px;padding:8px}select{max-width:230px}output{font-size:11px}}
+.solver{margin-left:auto;color:#345e93;text-decoration:none;white-space:nowrap}.solver:hover{text-decoration:underline}.solver:focus-visible{outline:2px solid #417fc5;outline-offset:2px}
 </style>
 <header>
  <label>Example <select id="example" aria-label="Example solution"></select></label>
  <label class="open">Open solution<input id="open" type="file" accept=".s2t" aria-label="Open local solution file"></label>
  <output id="message" aria-live="polite"></output>
+ <a class="solver" href="https://github.com/qwertpas/step2torque" target="_blank" rel="noopener">Try the open source 3D solver</a>
 </header>
 <iframe id="viewer" title="Motor field viewer" allow="fullscreen"></iframe>
 <script type="application/json" id="examples">__EXAMPLES__</script>
