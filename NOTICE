@@ -1,5 +1,0 @@
-viewer/vendor/step-viewer/section-shape.js is adapted from
-https://github.com/qwertpas/step-viewer/blob/main/src/section-shape.js.
-
-Three.js and three-mesh-bvh are distributed under their MIT licenses. Their
-license notices are retained in the bundled JavaScript.

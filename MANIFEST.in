@@ -1,9 +1,0 @@
-include LICENSE NOTICE README.md pyproject.toml setup.py
-recursive-include src/step2torque *.py *.cpp *.hpp *.csv *.json *.js *.html
-exclude src/step2torque/_assembly_version.py
-prune examples
-prune tests
-prune .github
-prune viewer
-prune build
-prune dist

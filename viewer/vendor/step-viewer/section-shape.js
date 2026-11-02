@@ -1,3 +1,4 @@
+/*! Adapted from https://github.com/qwertpas/step-viewer/blob/main/src/section-shape.js. */
 import * as THREE from "three";
 import { MeshBVH } from "three-mesh-bvh";
 
