@@ -33,7 +33,7 @@ def main():
     parser.add_argument(
         "--density", type=float, default=180, help="Streamline density (10 to 500)"
     )
-    parser.add_argument("--vmax", type=float, help="Colour scale maximum (T or %)")
+    parser.add_argument("--vmax", type=float, help="Colour scale maximum (T or %%)")
     parser.add_argument(
         "--resolution", type=int, default=800, help="PNG samples on the longer edge"
     )
