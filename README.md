@@ -47,7 +47,7 @@ example or open a local solution; files stay in your browser.
 
 Use `plane=Plane.axial(z=0)` or `Plane.longitudinal(angle=30)` to select a section
 in Python (`from step2torque import Plane`). Distances are mm relative to the
-motor center, with the shaft along z. [Visualization usage](docs/visualization.md).
+motor center, with the shaft along z.
 
 `motor.solve(angle=10, current={1: 2.0})` rotates moving parts 10 mechanical
 degrees from the STEP and uses fixed current. Use `current={}` for cogging.
