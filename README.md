@@ -1,15 +1,15 @@
 # step2torque
 
-Nonlinear 3D motor torque from a named STEP assembly.
+Fast nonlinear 3D FEM solver to get motor torque from a STEP assembly. Simple python interface makes it easy to evaluate your vibe-designed motors with arbitrary geometry.
 
 [Open the browser viewer](https://qwertpas.github.io/step2torque/)
 
 | Model | Flux density |
 |---|---|
-| <img src="examples/simple/model-3d.png" width="400" alt="Motor CAD view"> | <img src="examples/simple/field.png" width="400" alt="Motor flux section"> |
+| <img src="examples/simple/model-3d.png" height="300" alt="Motor CAD view"> | <img src="examples/simple/field.png" height="300" alt="Motor flux section"> |
 
 ```sh
-python3 -m pip install step2torque
+python3 -m pip install "git+https://github.com/qwertpas/step2torque.git"
 ```
 
 ```python
@@ -63,7 +63,7 @@ the shaft axis and center in mm. Periodic symmetry is detected automatically.
 Separate touching iron parts use a 10 µm surface contact. `Motor(...,
 contact_gap=0.01)` sets this gap in mm; use zero for perfect magnetic contact.
 
-CPU acceleration is included. `python3 -m pip install 'step2torque[cuda]'` enables NVIDIA
+GPU acceleration is included. `python3 -m pip install 'step2torque[cuda] @ git+https://github.com/qwertpas/step2torque.git'` enables NVIDIA
 cuDSS; `device="auto"` selects an available device. Optional solve arguments:
 `threads=8`, `mesh_size=0.6` (surface mm), `output="saved-solve"`.
 `air_radius=100` (mm) changes the outer air boundary for convergence checks.

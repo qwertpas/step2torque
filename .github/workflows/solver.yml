@@ -1,0 +1,19 @@
+name: Solver checks (manual)
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  solver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python3 -m pip install '.[test]'
+      - run: python3 -m pytest -q -m solver
+      - run: python3 examples/simple/run.py
+      - run: python3 examples/benchmarks/lrk/run.py --cpu
+      - run: python3 examples/benchmarks/axial/run.py --cpu
+      - run: python3 examples/benchmarks/analytic/run.py

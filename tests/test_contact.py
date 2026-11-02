@@ -12,6 +12,8 @@ from scipy.optimize import brentq
 from step2torque import Motor, _contact, _field
 from step2torque.materials import MU0, material
 
+pytestmark = pytest.mark.solver
+
 
 @pytest.mark.parametrize(
     "nonlinear,tangent", [(False, 0.0), (True, 0.0), (False, 500.0)]

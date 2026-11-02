@@ -14,6 +14,8 @@ from step2torque._mesh import coil_geometry
 from step2torque.materials import MU0
 from step2torque._source import rectangular_source, current_cells
 
+pytestmark = pytest.mark.solver
+
 
 def test_saturated_sphere_against_demagnetizing_solution(tmp_path):
     from scipy.optimize import brentq
