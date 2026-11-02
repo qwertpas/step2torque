@@ -1,0 +1,1638 @@
+{
+  "power_W": 5.5,
+  "temperature_C": 20,
+  "electrical_angles_deg": [
+    0,
+    12,
+    24,
+    36,
+    48
+  ],
+  "volume_definition": "Gross cylinder: pi * OD_mm**2 * overall_length_mm / 4 / 1000; bore included; published envelope held fixed.",
+  "method": "At zero electrical angle, screen both endpoints of every listed input separately using total torque at the saved nominal currents. Use those sensitivities to choose combined low/high settings, solve all five original positions, and re-optimize balanced currents at 5.5 W. Bounds are the minimum/maximum sampled five-position mean, including the original nominal mean; not guaranteed global extrema or statistical confidence limits. For the final Kollmorgen bounds, preserve its paired-current driven-torque definition (T(+I)-T(-I))/2.",
+  "geometry": "Preserve winding insulation clearance as hidden tooth/yoke/shoe dimensions vary; recompute copper fill from turns, winding dimensions and the published resistance. Keep the TQ winding head inside its dimensioned 47.6 mm OD and both Steadywin windings inside their overall axial envelopes. Extend shape changes through the air with a common affine mesh; rebuild CAD and remesh when the original tetrahedra cannot follow without folding. The CAD reconstruction reproduces each nominal solid to less than 1e-4 mm3 symmetric difference.",
+  "material_law": "Scale steel magnetic polarization J=B-mu0*H by 0.95..1.05 and H by 0.8..1.2 independently; add back mu0*H to preserve the vacuum slope. Stator stacking factor varies 0.93..0.97. Ring pole transitions span 0..10% of a pole pitch, represented by the equivalent mean Br reduction in the existing edge slices of each pole.",
+  "range_units": "Ranges below are additive deviations from the nominal inputs. br, stator_J, stator_H, rotor_J and rotor_H are fractional changes; mur and stack are absolute changes; *_mm are mm; *_deg are mechanical degrees; turns are turns per tooth; pole_transition is a fraction of pole pitch.",
+  "held_fixed": "Published envelope and stator stack lengths, slot/pole counts, connections, phase assignment, terminal resistance, power, temperature, field equations and final zero-floor Newton tolerance 1e-9. Alternate current conventions, different slot counts, lamination anisotropy and unmodeled skew are outside this parameter study.",
+  "engineering_ranges": "Engineering estimates around the present reconstruction, not measured production tolerances or fitted catalog torque: hidden core dimensions usually 0.05..0.10 mm, gap 0.03 mm, winding dimensions 0.02..0.03 mm with linked insulation clearances, inferred turns 1..2, sintered Br 5%, bonded Br 10%; Kollmorgen uses its previously declared 1.18..1.32 T grade range and the documented axial mounting tolerance 0.40 mm.",
+  "sources": [
+    {
+      "url": "https://www.eclipsemagnetics.com/site/assets/files/22177/eclipsemagnetics_ndfeb_datasheet.pdf",
+      "use": "Manufacturer guidance: typical magnet dimensional tolerances 0.05..0.10 mm; grade-dependent remanence. Reconstruction uncertainty need not equal a production tolerance."
+    },
+    {
+      "url": "https://www.arnoldmagnetics.com/products/neodymium-iron-boron-magnets/",
+      "use": "Sintered NdFeB grade families and nominal remanence."
+    },
+    {
+      "url": "https://www.arnoldmagnetics.cn/wp-content/uploads/2017/10/Manufacturing-and-performance-comparison-between-bonded-and-sintered-permanent-magnets-Constantinides-APEEM-2006-psn-hi-res.pdf",
+      "use": "Typical recoil permeability near 1.05 sintered and 1.1..1.7 isotropic bonded NdFeB; chosen local ranges are 1.03..1.07 and 1.10..1.30."
+    },
+    {
+      "url": "https://mqitechnology.com/wp-content/uploads/2018/10/mqp-b-20441-070.pdf",
+      "use": "Generic bonded NdFeB family; finished-ring Br also depends on binder loading and magnetization."
+    },
+    {
+      "url": "https://www.thyssenkrupp-steel.com/media/content_1/publikationen/lieferprogramme/thyssenkrupp_product-range_no-electrical-steel_powercore_steel_en.pdf",
+      "use": "Electrical steel grade and processing dependence; the chosen J/H and stack perturbations are engineering estimates, not vendor specifications."
+    },
+    {
+      "url": "https://www.carpenterelectrification.com/hubfs/Resources/Datasheets/20200622-CT_430FR-Solenoid-Quality-Data-Sheet.pdf",
+      "use": "Candidate rotor B-H data and processing dependence for Kollmorgen."
+    },
+    {
+      "url": "https://www.kollmorgen.com/sites/default/files/2023-08/TBM2G_Installation-ge-en-it-sp-fr_0.pdf",
+      "use": "0.70 +/- 0.40 mm mounting edge offset, used as rotor axial-placement perturbation."
+    }
+  ],
+  "analysis_files": {
+    "study.py": "1645781fb262ccac0ca5656be1c17e4e21665854a074d4e2c9f3f302aa3c2596",
+    "rebuild.py": "a1c0047614f5c6bac2a4f853831824a0b92768a0f02bcde09eeee00c2fe5c067"
+  },
+  "cases": [
+    {
+      "id": "tq",
+      "name": "TQ ILM50x14",
+      "label": "TQ\nILM50\u00d714",
+      "od_mm": 50,
+      "overall_length_mm": 22.6,
+      "envelope_cm3": 44.37499623195583,
+      "nominal_Nm": 0.3161167719313937,
+      "min_Nm": 0.25881455919314134,
+      "max_Nm": 0.37530629219876155,
+      "catalog_Nm": 0.318948271668,
+      "nominal_inputs": {
+        "turns_per_tooth": 24.0,
+        "Br_T": 1.39,
+        "mur": 1.05,
+        "stack_factor": 0.95
+      },
+      "perturbation_deltas": {
+        "br": [
+          -0.05,
+          0.05
+        ],
+        "mur": [
+          -0.02,
+          0.02
+        ],
+        "stator_J": [
+          -0.05,
+          0.05
+        ],
+        "stator_H": [
+          -0.2,
+          0.2
+        ],
+        "stack": [
+          -0.02,
+          0.02
+        ],
+        "gap_mm": [
+          -0.03,
+          0.03
+        ],
+        "tooth_mm": [
+          -0.1,
+          0.1
+        ],
+        "yoke_mm": [
+          -0.1,
+          0.05
+        ],
+        "coil_inner_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_outer_r_mm": [
+          -0.03,
+          0.0
+        ],
+        "coil_width_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_height_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_inner_width_mm": [
+          -0.02,
+          0.02
+        ],
+        "coil_inner_height_mm": [
+          -0.02,
+          0.02
+        ],
+        "magnet_direction_deg": [
+          -2.0,
+          2.0
+        ],
+        "rotor_J": [
+          -0.05,
+          0.05
+        ],
+        "rotor_H": [
+          -0.2,
+          0.2
+        ],
+        "turns": [
+          -1,
+          1
+        ],
+        "shoe_mm": [
+          -0.05,
+          0.05
+        ],
+        "shoe_angle_deg": [
+          -0.2,
+          0.2
+        ],
+        "magnet_thickness_mm": [
+          -0.05,
+          0.05
+        ],
+        "magnet_width_mm": [
+          -0.05,
+          0.05
+        ],
+        "bond_mm": [
+          -0.02,
+          0.02
+        ]
+      },
+      "nominal_at_zero_Nm": 0.3104284764822945,
+      "endpoint_torque_at_zero_Nm": {
+        "br": [
+          0.30212754800073,
+          0.3182360273225035
+        ],
+        "mur": [
+          0.3115880782378707,
+          0.3092780987490811
+        ],
+        "stator_J": [
+          0.30084992710686426,
+          0.31961703659248475
+        ],
+        "stator_H": [
+          0.313329282653219,
+          0.3081136578607071
+        ],
+        "stack": [
+          0.30636007668004417,
+          0.3144460514954481
+        ],
+        "gap_mm": [
+          0.3138428033156947,
+          0.30691499249844517
+        ],
+        "tooth_mm": [
+          0.3081692226915346,
+          0.3120113214668746
+        ],
+        "yoke_mm": [
+          0.30080478912986947,
+          0.31411868563482953
+        ],
+        "coil_inner_r_mm": [
+          0.31049507032698814,
+          0.310359203294112
+        ],
+        "coil_outer_r_mm": [
+          0.3104665296348771,
+          0.3104284764822946
+        ],
+        "coil_width_mm": [
+          0.31042148241527867,
+          0.3104293952853145
+        ],
+        "coil_height_mm": [
+          0.31042162414880586,
+          0.31043526756533585
+        ],
+        "coil_inner_width_mm": [
+          0.31041795424665025,
+          0.3104389263732624
+        ],
+        "coil_inner_height_mm": [
+          0.3104206231641011,
+          0.31043625234206335
+        ],
+        "magnet_direction_deg": [
+          0.31089034909118934,
+          0.3097916377000801
+        ],
+        "rotor_J": [
+          0.31040295634844056,
+          0.31044674153318974
+        ],
+        "rotor_H": [
+          0.3104779240274109,
+          0.3103788693897492
+        ],
+        "turns": [
+          0.29849681126453614,
+          0.3223121251893193
+        ],
+        "shoe_mm": [
+          0.31002600952163645,
+          0.31082911111079453
+        ],
+        "shoe_angle_deg": [
+          0.3162227638821836,
+          0.3016574168971469
+        ],
+        "magnet_thickness_mm": [
+          0.3091526199940513,
+          0.311571042939906
+        ],
+        "magnet_width_mm": [
+          0.31075298259594814,
+          0.3102090061166092
+        ],
+        "bond_mm": [
+          0.31236421104941703,
+          0.30853083024322553
+        ]
+      },
+      "combined": {
+        "lower": {
+          "mean_Nm": 0.25881455919314134,
+          "change": {
+            "br": -0.05,
+            "mur": 0.02,
+            "stator_J": -0.05,
+            "stator_H": 0.2,
+            "stack": -0.02,
+            "gap_mm": 0.03,
+            "tooth_mm": -0.1,
+            "yoke_mm": -0.1,
+            "coil_inner_r_mm": 0.03,
+            "coil_outer_r_mm": 0,
+            "coil_width_mm": -0.03,
+            "coil_height_mm": -0.03,
+            "coil_inner_width_mm": -0.02,
+            "coil_inner_height_mm": -0.02,
+            "magnet_direction_deg": 2.0,
+            "rotor_J": -0.05,
+            "rotor_H": 0.2,
+            "turns": -1,
+            "shoe_mm": -0.05,
+            "shoe_angle_deg": 0.2,
+            "magnet_thickness_mm": -0.05,
+            "magnet_width_mm": 0.05,
+            "bond_mm": 0.02
+          },
+          "torque_Nm": [
+            0.25059669705149623,
+            0.2526822581911576,
+            0.2613479282931327,
+            0.2624276010203735,
+            0.2670183114095468
+          ]
+        },
+        "upper": {
+          "mean_Nm": 0.37530629219876155,
+          "change": {
+            "br": 0.05,
+            "mur": -0.02,
+            "stator_J": 0.05,
+            "stator_H": -0.2,
+            "stack": 0.02,
+            "gap_mm": -0.03,
+            "tooth_mm": 0.1,
+            "yoke_mm": 0.05,
+            "coil_inner_r_mm": -0.03,
+            "coil_outer_r_mm": -0.03,
+            "coil_width_mm": 0.03,
+            "coil_height_mm": 0.03,
+            "coil_inner_width_mm": 0.02,
+            "coil_inner_height_mm": 0.02,
+            "magnet_direction_deg": -2.0,
+            "rotor_J": 0.05,
+            "rotor_H": -0.2,
+            "turns": 1,
+            "shoe_mm": 0.05,
+            "shoe_angle_deg": -0.2,
+            "magnet_thickness_mm": 0.05,
+            "magnet_width_mm": -0.05,
+            "bond_mm": -0.02
+          },
+          "torque_Nm": [
+            0.37224100181357145,
+            0.3653402542191539,
+            0.3736894360360528,
+            0.376489549645399,
+            0.38877121927963054
+          ]
+        }
+      },
+      "remeshed_samples": 0,
+      "samples": 57,
+      "seed_mesh_sha256": [
+        "d706d709d1d226658e0382e4cfa8fa6c49d6f0a581b934c7abc7cb517d629a96",
+        "1870e2ed8681b82847c2f6ecc14b922024188a765ef53e78ea54511ebce2d198",
+        "68d1520a3e83523ded5efcfddf0d6e925902d3881bcd152978603b552cc8a3bf",
+        "e31f222eedc9dfb179894bcdf8f812bf7167981139a4262d329fc46d262f38ae",
+        "d4daaf50f6735a0519e72e28bcfa52c85d51906d9a16a34d67dcd6ea4bfcec0d"
+      ],
+      "seed_step_sha256": "1d15562fce9eb45d96a0d2824f90f08d2dd30b7ebb07b1497a6bbc4b35655c9b"
+    },
+    {
+      "id": "mosrac",
+      "name": "Mosrac U5019",
+      "label": "Mosrac\nU5019",
+      "od_mm": 50,
+      "overall_length_mm": 19.9,
+      "envelope_cm3": 39.07355862902305,
+      "nominal_Nm": 0.2466146370120819,
+      "min_Nm": 0.2036034822375757,
+      "max_Nm": 0.28904245143609497,
+      "catalog_Nm": 0.25952,
+      "nominal_inputs": {
+        "turns_per_tooth": 23.0,
+        "Br_T": 1.32,
+        "mur": 1.05,
+        "stack_factor": 0.95
+      },
+      "perturbation_deltas": {
+        "br": [
+          -0.05,
+          0.05
+        ],
+        "mur": [
+          -0.02,
+          0.02
+        ],
+        "stator_J": [
+          -0.05,
+          0.05
+        ],
+        "stator_H": [
+          -0.2,
+          0.2
+        ],
+        "stack": [
+          -0.02,
+          0.02
+        ],
+        "gap_mm": [
+          -0.03,
+          0.03
+        ],
+        "tooth_mm": [
+          -0.1,
+          0.1
+        ],
+        "yoke_mm": [
+          -0.1,
+          0.1
+        ],
+        "coil_inner_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_outer_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_width_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_height_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_inner_width_mm": [
+          -0.02,
+          0.02
+        ],
+        "coil_inner_height_mm": [
+          -0.02,
+          0.02
+        ],
+        "magnet_direction_deg": [
+          -2.0,
+          2.0
+        ],
+        "rotor_J": [
+          -0.05,
+          0.05
+        ],
+        "rotor_H": [
+          -0.2,
+          0.2
+        ],
+        "turns": [
+          -1,
+          1
+        ],
+        "shoe_mm": [
+          -0.05,
+          0.05
+        ],
+        "shoe_angle_deg": [
+          -0.2,
+          0.2
+        ],
+        "magnet_thickness_mm": [
+          -0.1,
+          0.1
+        ],
+        "pole_transition": [
+          0.0,
+          0.1
+        ]
+      },
+      "nominal_at_zero_Nm": 0.24566711705171485,
+      "endpoint_torque_at_zero_Nm": {
+        "br": [
+          0.23941812893029452,
+          0.2510561816115165
+        ],
+        "mur": [
+          0.24617212731565358,
+          0.24515849419198418
+        ],
+        "stator_J": [
+          0.23815644489089705,
+          0.25242294940034804
+        ],
+        "stator_H": [
+          0.24821169394304035,
+          0.24357913042494847
+        ],
+        "stack": [
+          0.24255965975277471,
+          0.24858295039917463
+        ],
+        "gap_mm": [
+          0.24872635854600647,
+          0.24246981140297943
+        ],
+        "tooth_mm": [
+          0.24307389226467008,
+          0.248000877074081
+        ],
+        "yoke_mm": [
+          0.24548177339258967,
+          0.245765539916428
+        ],
+        "coil_inner_r_mm": [
+          0.24569685167194882,
+          0.2456358747330789
+        ],
+        "coil_outer_r_mm": [
+          0.24567716670574882,
+          0.245657172892081
+        ],
+        "coil_width_mm": [
+          0.24562583664902857,
+          0.24570092762625656
+        ],
+        "coil_height_mm": [
+          0.24566681250857095,
+          0.2456673942912287
+        ],
+        "coil_inner_width_mm": [
+          0.2456608812676168,
+          0.24567340704822052
+        ],
+        "coil_inner_height_mm": [
+          0.2456677168328394,
+          0.24566654204469277
+        ],
+        "magnet_direction_deg": [
+          0.2456863466880536,
+          0.24538458012869946
+        ],
+        "rotor_J": [
+          0.24505612570613808,
+          0.24603634505979727
+        ],
+        "rotor_H": [
+          0.24586194361226646,
+          0.24549222590305456
+        ],
+        "turns": [
+          0.2353813087390455,
+          0.2559036444110772
+        ],
+        "shoe_mm": [
+          0.24335924776478673,
+          0.24732957796608693
+        ],
+        "shoe_angle_deg": [
+          0.24819267388760424,
+          0.2413328840788349
+        ],
+        "magnet_thickness_mm": [
+          0.24527345335771186,
+          0.2454523709881495
+        ],
+        "pole_transition": [
+          0.24566711705171485,
+          0.24223005990048913
+        ]
+      },
+      "combined": {
+        "lower": {
+          "mean_Nm": 0.2036034822375757,
+          "change": {
+            "br": -0.05,
+            "mur": 0.02,
+            "stator_J": -0.05,
+            "stator_H": 0.2,
+            "stack": -0.02,
+            "gap_mm": 0.03,
+            "tooth_mm": -0.1,
+            "yoke_mm": -0.1,
+            "coil_inner_r_mm": 0.03,
+            "coil_outer_r_mm": 0.03,
+            "coil_width_mm": -0.03,
+            "coil_height_mm": -0.03,
+            "coil_inner_width_mm": -0.02,
+            "coil_inner_height_mm": 0.02,
+            "magnet_direction_deg": 2.0,
+            "rotor_J": -0.05,
+            "rotor_H": 0.2,
+            "turns": -1,
+            "shoe_mm": -0.05,
+            "shoe_angle_deg": 0.2,
+            "magnet_thickness_mm": -0.1,
+            "pole_transition": 0.1
+          },
+          "torque_Nm": [
+            0.20239321189184215,
+            0.1977066436932975,
+            0.20323201166860616,
+            0.2039288459711599,
+            0.2107566979629729
+          ]
+        },
+        "upper": {
+          "mean_Nm": 0.28904245143609497,
+          "change": {
+            "br": 0.05,
+            "mur": -0.02,
+            "stator_J": 0.05,
+            "stator_H": -0.2,
+            "stack": 0.02,
+            "gap_mm": -0.03,
+            "tooth_mm": 0.1,
+            "yoke_mm": 0.1,
+            "coil_inner_r_mm": -0.03,
+            "coil_outer_r_mm": -0.03,
+            "coil_width_mm": 0.03,
+            "coil_height_mm": 0.03,
+            "coil_inner_width_mm": 0.02,
+            "coil_inner_height_mm": -0.02,
+            "magnet_direction_deg": -2.0,
+            "rotor_J": 0.05,
+            "rotor_H": -0.2,
+            "turns": 1,
+            "shoe_mm": 0.05,
+            "shoe_angle_deg": -0.2,
+            "magnet_thickness_mm": 0,
+            "pole_transition": 0
+          },
+          "torque_Nm": [
+            0.28767300590277894,
+            0.28033718122510637,
+            0.29111109436704435,
+            0.2860448585848953,
+            0.30004611710064993
+          ]
+        }
+      },
+      "remeshed_samples": 0,
+      "samples": 55,
+      "seed_mesh_sha256": [
+        "dcb58e7dcdf44de81afbd04d4a26f419a25cf0e14252c27ace321690f676c10f",
+        "77b0a7f62d33a56a0462801a9fe98a67c28fb96d347c4b1a439d1cf1f2957316",
+        "769d7920210cd8094e28e38665f83a98040056fb3d45b1990db595e3f543fab6",
+        "32d6c01d1ede61b2048b4359bfc35986f1ffc936071141b2ae1fbb395163bf6d",
+        "b326cf47a0dd86c238c548e892aa4fed6fcbc73f3dfb874e2bf740cbedd78706"
+      ],
+      "seed_step_sha256": "654a4cd8445c8b05e5ee0265e57c75797b66b77a896872e26087c8a2229b9f81"
+    },
+    {
+      "id": "kollmorgen",
+      "name": "Kollmorgen TBM2G-05013A",
+      "label": "Kollmorgen\nTBM2G-05013A",
+      "od_mm": 50,
+      "overall_length_mm": 24.34,
+      "envelope_cm3": 47.79147824273473,
+      "nominal_Nm": 0.20251245289076775,
+      "min_Nm": 0.16896598361721155,
+      "max_Nm": 0.24016143995333086,
+      "catalog_Nm": 0.19656,
+      "nominal_inputs": {
+        "turns_per_tooth": 42.0,
+        "Br_T": 1.24,
+        "mur": 1.05,
+        "stack_factor": 0.95
+      },
+      "perturbation_deltas": {
+        "br": [
+          -0.048387096774193616,
+          0.06451612903225823
+        ],
+        "mur": [
+          -0.02,
+          0.02
+        ],
+        "stator_J": [
+          -0.05,
+          0.05
+        ],
+        "stator_H": [
+          -0.2,
+          0.2
+        ],
+        "stack": [
+          -0.02,
+          0.02
+        ],
+        "gap_mm": [
+          -0.03,
+          0.03
+        ],
+        "tooth_mm": [
+          -0.1,
+          0.1
+        ],
+        "yoke_mm": [
+          -0.1,
+          0.1
+        ],
+        "coil_inner_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_outer_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_width_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_height_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_inner_width_mm": [
+          -0.02,
+          0.02
+        ],
+        "coil_inner_height_mm": [
+          -0.02,
+          0.02
+        ],
+        "magnet_direction_deg": [
+          -2.0,
+          2.0
+        ],
+        "rotor_J": [
+          -0.05,
+          0.05
+        ],
+        "rotor_H": [
+          -0.2,
+          0.2
+        ],
+        "turns": [
+          -2,
+          2
+        ],
+        "shoe_mm": [
+          -0.05,
+          0.05
+        ],
+        "shoe_angle_deg": [
+          -0.2,
+          0.2
+        ],
+        "magnet_thickness_mm": [
+          -0.1,
+          0.1
+        ],
+        "bond_mm": [
+          -0.03,
+          0.03
+        ],
+        "rotor_z_mm": [
+          -0.4,
+          0.4
+        ],
+        "magnet_length_mm": [
+          -0.2,
+          0.2
+        ],
+        "pole_transition": [
+          0.0,
+          0.1
+        ]
+      },
+      "nominal_at_zero_Nm": 0.20459603085630113,
+      "endpoint_torque_at_zero_Nm": {
+        "br": [
+          0.197735802608573,
+          0.2129351273748966
+        ],
+        "mur": [
+          0.20523671069441282,
+          0.20396136141678484
+        ],
+        "stator_J": [
+          0.20156318158861738,
+          0.20704982504761454
+        ],
+        "stator_H": [
+          0.20559230401179998,
+          0.20371941165531707
+        ],
+        "stack": [
+          0.2034367553846065,
+          0.20562561207384575
+        ],
+        "gap_mm": [
+          0.20755498551968854,
+          0.20158925089136878
+        ],
+        "tooth_mm": [
+          0.20327084773376078,
+          0.20548883496338435
+        ],
+        "yoke_mm": [
+          0.20376806524743854,
+          0.20501950757103468
+        ],
+        "coil_inner_r_mm": [
+          0.20461533664758574,
+          0.20457709266961
+        ],
+        "coil_outer_r_mm": [
+          0.20460384145695545,
+          0.2045882894025308
+        ],
+        "coil_width_mm": [
+          0.20458803468022568,
+          0.20460320195037096
+        ],
+        "coil_height_mm": [
+          0.20457537384486188,
+          0.20461669084333964
+        ],
+        "coil_inner_width_mm": [
+          0.2045867916389696,
+          0.20460584176749486
+        ],
+        "coil_inner_height_mm": [
+          0.20458646204153533,
+          0.2046057020237492
+        ],
+        "magnet_direction_deg": [
+          0.20213823666714562,
+          0.20670317690709897
+        ],
+        "rotor_J": [
+          0.20366078070224794,
+          0.20534990620000748
+        ],
+        "rotor_H": [
+          0.20483211070263588,
+          0.20438971453411592
+        ],
+        "turns": [
+          0.19470903695347808,
+          0.21447357338693668
+        ],
+        "shoe_mm": [
+          0.20497185164505755,
+          0.20457223971666777
+        ],
+        "shoe_angle_deg": [
+          0.20618801280511664,
+          0.20211918691011468
+        ],
+        "magnet_thickness_mm": [
+          0.2045922625040854,
+          0.20436113019775792
+        ],
+        "bond_mm": [
+          0.20620960669269575,
+          0.20299738922768612
+        ],
+        "rotor_z_mm": [
+          0.20707350657199217,
+          0.2054036328730686
+        ],
+        "magnet_length_mm": [
+          0.2038328935718452,
+          0.20529247232648856
+        ],
+        "pole_transition": [
+          0.20459603085630107,
+          0.19928136316100709
+        ]
+      },
+      "combined": {
+        "lower": {
+          "mean_Nm": 0.16896598361721155,
+          "change": {
+            "br": -0.048387096774193616,
+            "mur": 0.02,
+            "stator_J": -0.05,
+            "stator_H": 0.2,
+            "stack": -0.02,
+            "gap_mm": 0.03,
+            "tooth_mm": -0.1,
+            "yoke_mm": -0.1,
+            "coil_inner_r_mm": 0.03,
+            "coil_outer_r_mm": 0.03,
+            "coil_width_mm": -0.03,
+            "coil_height_mm": -0.03,
+            "coil_inner_width_mm": -0.02,
+            "coil_inner_height_mm": -0.02,
+            "magnet_direction_deg": -2.0,
+            "rotor_J": -0.05,
+            "rotor_H": 0.2,
+            "turns": -2,
+            "shoe_mm": 0.05,
+            "shoe_angle_deg": 0.2,
+            "magnet_thickness_mm": 0.1,
+            "bond_mm": 0.03,
+            "rotor_z_mm": 0,
+            "magnet_length_mm": -0.2,
+            "pole_transition": 0.1
+          },
+          "torque_Nm": [
+            0.1732400765375684,
+            0.1644081698588758,
+            0.1679185420448095,
+            0.17123431280466844,
+            0.16802881684013568
+          ]
+        },
+        "upper": {
+          "mean_Nm": 0.24016143995333086,
+          "change": {
+            "br": 0.06451612903225823,
+            "mur": -0.02,
+            "stator_J": 0.05,
+            "stator_H": -0.2,
+            "stack": 0.02,
+            "gap_mm": -0.03,
+            "tooth_mm": 0.1,
+            "yoke_mm": 0.1,
+            "coil_inner_r_mm": -0.03,
+            "coil_outer_r_mm": -0.03,
+            "coil_width_mm": 0.03,
+            "coil_height_mm": 0.03,
+            "coil_inner_width_mm": 0.02,
+            "coil_inner_height_mm": 0.02,
+            "magnet_direction_deg": 2.0,
+            "rotor_J": 0.05,
+            "rotor_H": -0.2,
+            "turns": 2,
+            "shoe_mm": -0.05,
+            "shoe_angle_deg": -0.2,
+            "magnet_thickness_mm": 0,
+            "bond_mm": -0.03,
+            "rotor_z_mm": -0.4,
+            "magnet_length_mm": 0.2,
+            "pole_transition": 0
+          },
+          "torque_Nm": [
+            0.24775913131614635,
+            0.2318324865258264,
+            0.23869186217902738,
+            0.24247746895709799,
+            0.24004625078855624
+          ]
+        }
+      },
+      "remeshed_samples": 1,
+      "samples": 61,
+      "seed_mesh_sha256": [
+        "2fd19f4b50aabd612034306ee74fb444007435945be3dd11dd5956c2030f077f",
+        "1bdb8956b3295ff718060e41acde749a7877aee5647b1d6242156d5d8260175f",
+        "6e191862db5ac6285c0d9074390f715909865556fe4b87381d4c5cf6e66888d5",
+        "da9886de3d28b5fd927a8f7dac081fdc632caf29c801b4b5817eb282a52f50cd",
+        "f2fe4e9d18362dcb24b866b74d1ca229f98f4a113fdbb3bcdac88fc8a0ab78ce"
+      ],
+      "seed_step_sha256": "10920eed846a5d8b0c53f374d0e8e21c591f2059de1b86032299db3ac068f54a"
+    },
+    {
+      "id": "cubemars",
+      "name": "CubeMars RI60 KV120",
+      "label": "CubeMars\nRI60 KV120",
+      "od_mm": 60,
+      "overall_length_mm": 23,
+      "envelope_cm3": 65.03096792930872,
+      "nominal_Nm": 0.1980527704482357,
+      "min_Nm": 0.17304938523983715,
+      "max_Nm": 0.22446930489944422,
+      "catalog_Nm": 0.20184,
+      "nominal_inputs": {
+        "turns_per_tooth": 27.0,
+        "Br_T": 1.32,
+        "mur": 1.05,
+        "stack_factor": 0.95
+      },
+      "perturbation_deltas": {
+        "br": [
+          -0.05,
+          0.05
+        ],
+        "mur": [
+          -0.02,
+          0.02
+        ],
+        "stator_J": [
+          -0.05,
+          0.05
+        ],
+        "stator_H": [
+          -0.2,
+          0.2
+        ],
+        "stack": [
+          -0.02,
+          0.02
+        ],
+        "gap_mm": [
+          -0.03,
+          0.03
+        ],
+        "tooth_mm": [
+          -0.1,
+          0.1
+        ],
+        "yoke_mm": [
+          -0.1,
+          0.1
+        ],
+        "coil_inner_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_outer_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_width_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_height_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_inner_width_mm": [
+          -0.02,
+          0.02
+        ],
+        "coil_inner_height_mm": [
+          -0.02,
+          0.02
+        ],
+        "magnet_direction_deg": [
+          -2.0,
+          2.0
+        ],
+        "rotor_J": [
+          -0.05,
+          0.05
+        ],
+        "rotor_H": [
+          -0.2,
+          0.2
+        ],
+        "turns": [
+          -1,
+          1
+        ],
+        "shoe_mm": [
+          -0.05,
+          0.05
+        ],
+        "shoe_angle_deg": [
+          -0.2,
+          0.2
+        ]
+      },
+      "nominal_at_zero_Nm": 0.1983601155247379,
+      "endpoint_torque_at_zero_Nm": {
+        "br": [
+          0.18860670766583917,
+          0.20804633798873468
+        ],
+        "mur": [
+          0.199794499567109,
+          0.19694659356348512
+        ],
+        "stator_J": [
+          0.19794649916159343,
+          0.1986459359704668
+        ],
+        "stator_H": [
+          0.19896666437463562,
+          0.19776293419537805
+        ],
+        "stack": [
+          0.1982022366533382,
+          0.19849460408857808
+        ],
+        "gap_mm": [
+          0.20397328251975644,
+          0.19295107535108214
+        ],
+        "tooth_mm": [
+          0.19821555204347968,
+          0.19848094453645868
+        ],
+        "yoke_mm": [
+          0.19830879026291354,
+          0.19840434602154997
+        ],
+        "coil_inner_r_mm": [
+          0.19836747086577303,
+          0.19835274969958225
+        ],
+        "coil_outer_r_mm": [
+          0.1983618385875612,
+          0.1983583996784654
+        ],
+        "coil_width_mm": [
+          0.19835666124545248,
+          0.19836206842001686
+        ],
+        "coil_height_mm": [
+          0.19835790952478377,
+          0.1983623068139109
+        ],
+        "coil_inner_width_mm": [
+          0.19835870262356456,
+          0.1983616067686291
+        ],
+        "coil_inner_height_mm": [
+          0.19835743729885186,
+          0.19836293677821434
+        ],
+        "magnet_direction_deg": [
+          0.19819526604200594,
+          0.19828415729376622
+        ],
+        "rotor_J": [
+          0.1983468514133011,
+          0.1983714041345255
+        ],
+        "rotor_H": [
+          0.19840095004702743,
+          0.19831934073343696
+        ],
+        "turns": [
+          0.19101123900282163,
+          0.2057026588758262
+        ],
+        "shoe_mm": [
+          0.19832172998076086,
+          0.19837192720826632
+        ],
+        "shoe_angle_deg": [
+          0.1982319638234843,
+          0.19779628175104644
+        ]
+      },
+      "combined": {
+        "lower": {
+          "mean_Nm": 0.17304938523983715,
+          "change": {
+            "br": -0.05,
+            "mur": 0.02,
+            "stator_J": -0.05,
+            "stator_H": 0.2,
+            "stack": -0.02,
+            "gap_mm": 0.03,
+            "tooth_mm": -0.1,
+            "yoke_mm": -0.1,
+            "coil_inner_r_mm": 0.03,
+            "coil_outer_r_mm": 0.03,
+            "coil_width_mm": -0.03,
+            "coil_height_mm": -0.03,
+            "coil_inner_width_mm": -0.02,
+            "coil_inner_height_mm": -0.02,
+            "magnet_direction_deg": -2.0,
+            "rotor_J": -0.05,
+            "rotor_H": 0.2,
+            "turns": -1,
+            "shoe_mm": -0.05,
+            "shoe_angle_deg": 0.2
+          },
+          "torque_Nm": [
+            0.17314375732424292,
+            0.17171493047708586,
+            0.17417613157639406,
+            0.17351631094504463,
+            0.17269579587641834
+          ]
+        },
+        "upper": {
+          "mean_Nm": 0.22446930489944422,
+          "change": {
+            "br": 0.05,
+            "mur": -0.02,
+            "stator_J": 0.05,
+            "stator_H": -0.2,
+            "stack": 0.02,
+            "gap_mm": -0.03,
+            "tooth_mm": 0.1,
+            "yoke_mm": 0.1,
+            "coil_inner_r_mm": -0.03,
+            "coil_outer_r_mm": -0.03,
+            "coil_width_mm": 0.03,
+            "coil_height_mm": 0.03,
+            "coil_inner_width_mm": 0.02,
+            "coil_inner_height_mm": 0.02,
+            "magnet_direction_deg": 0,
+            "rotor_J": 0.05,
+            "rotor_H": -0.2,
+            "turns": 1,
+            "shoe_mm": 0.05,
+            "shoe_angle_deg": 0
+          },
+          "torque_Nm": [
+            0.22487540291984087,
+            0.22262025725068674,
+            0.2261443562430301,
+            0.22495139701111216,
+            0.22375511107255117
+          ]
+        }
+      },
+      "remeshed_samples": 0,
+      "samples": 51,
+      "seed_mesh_sha256": [
+        "c6661a7924936e6e66052b34413c51c1cbbd43ade43399bf9f26abc83952f0de",
+        "906e3cccf37a75256d0addad418b386eee7341eb5e59b8bba2360dff4e2e44eb",
+        "d59d53f20dbcbd5f4daac6c3407ac7ad5e6c33a685f6ecf659401072d7df8111",
+        "6ca48357a9423ca3c58a4a86cc4bbcc9d56d13fe5ec8a3ae023946301904614b",
+        "a8eff89bb36df74da07dd68e522fb2b259d1372c5d8fe78b2ee80befb2d96f17"
+      ],
+      "seed_step_sha256": "09016135481127e9d3d8df874debfe2b94eac61ae3aa6f964460279396225932"
+    },
+    {
+      "id": "segmented",
+      "name": "Steadywin WK4310CP",
+      "label": "Steadywin\nWK4310CP",
+      "od_mm": 49,
+      "overall_length_mm": 15,
+      "envelope_cm3": 28.2861148547591,
+      "nominal_Nm": 0.1803760475033616,
+      "min_Nm": 0.15569095474758307,
+      "max_Nm": 0.206657919297899,
+      "catalog_Nm": 0.16791,
+      "nominal_inputs": {
+        "turns_per_tooth": 60.0,
+        "Br_T": 1.32,
+        "mur": 1.05,
+        "stack_factor": 0.95
+      },
+      "perturbation_deltas": {
+        "br": [
+          -0.05,
+          0.05
+        ],
+        "mur": [
+          -0.02,
+          0.02
+        ],
+        "stator_J": [
+          -0.05,
+          0.05
+        ],
+        "stator_H": [
+          -0.2,
+          0.2
+        ],
+        "stack": [
+          -0.02,
+          0.02
+        ],
+        "gap_mm": [
+          -0.03,
+          0.03
+        ],
+        "tooth_mm": [
+          -0.1,
+          0.1
+        ],
+        "yoke_mm": [
+          -0.1,
+          0.1
+        ],
+        "coil_inner_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_outer_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_width_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_height_mm": [
+          -0.03,
+          0.0
+        ],
+        "coil_inner_width_mm": [
+          -0.02,
+          0.02
+        ],
+        "coil_inner_height_mm": [
+          -0.02,
+          0.02
+        ],
+        "magnet_direction_deg": [
+          -2.0,
+          2.0
+        ],
+        "rotor_J": [
+          -0.05,
+          0.05
+        ],
+        "rotor_H": [
+          -0.2,
+          0.2
+        ]
+      },
+      "nominal_at_zero_Nm": 0.1713590612874594,
+      "endpoint_torque_at_zero_Nm": {
+        "br": [
+          0.16755991201638876,
+          0.1751912504181909
+        ],
+        "mur": [
+          0.1716648959920125,
+          0.17106608576162538
+        ],
+        "stator_J": [
+          0.16651954505117136,
+          0.17578786938561247
+        ],
+        "stator_H": [
+          0.17387744270539174,
+          0.16963601199764006
+        ],
+        "stack": [
+          0.16947197510844578,
+          0.1732058339723632
+        ],
+        "gap_mm": [
+          0.17205835906084588,
+          0.17075153613343483
+        ],
+        "tooth_mm": [
+          0.15954349165960446,
+          0.18154493646294326
+        ],
+        "yoke_mm": [
+          0.1708359219285105,
+          0.17187579599085231
+        ],
+        "coil_inner_r_mm": [
+          0.17133061363393304,
+          0.17138766318121249
+        ],
+        "coil_outer_r_mm": [
+          0.17127314020687445,
+          0.1714488515394842
+        ],
+        "coil_width_mm": [
+          0.17132014812185098,
+          0.17139680501952997
+        ],
+        "coil_height_mm": [
+          0.17135699325449796,
+          0.17135906128745942
+        ],
+        "coil_inner_width_mm": [
+          0.1713356331618789,
+          0.1713834595447301
+        ],
+        "coil_inner_height_mm": [
+          0.17135942070659338,
+          0.17135982893074092
+        ],
+        "magnet_direction_deg": [
+          0.1720150763161284,
+          0.17037563720274454
+        ],
+        "rotor_J": [
+          0.17130153503432105,
+          0.17139379496006346
+        ],
+        "rotor_H": [
+          0.17137629586163047,
+          0.17133900393232873
+        ]
+      },
+      "combined": {
+        "lower": {
+          "mean_Nm": 0.15569095474758307,
+          "change": {
+            "br": -0.05,
+            "mur": 0.02,
+            "stator_J": -0.05,
+            "stator_H": 0.2,
+            "stack": -0.02,
+            "gap_mm": 0.03,
+            "tooth_mm": -0.1,
+            "yoke_mm": -0.1,
+            "coil_inner_r_mm": -0.03,
+            "coil_outer_r_mm": -0.03,
+            "coil_width_mm": -0.03,
+            "coil_height_mm": -0.03,
+            "coil_inner_width_mm": -0.02,
+            "coil_inner_height_mm": 0,
+            "magnet_direction_deg": 2.0,
+            "rotor_J": -0.05,
+            "rotor_H": 0.2
+          },
+          "torque_Nm": [
+            0.1468894836704846,
+            0.16711989889953896,
+            0.14377196189050637,
+            0.16089892976628933,
+            0.15977449951109612
+          ]
+        },
+        "upper": {
+          "mean_Nm": 0.206657919297899,
+          "change": {
+            "br": 0.05,
+            "mur": -0.02,
+            "stator_J": 0.05,
+            "stator_H": -0.2,
+            "stack": 0.02,
+            "gap_mm": -0.03,
+            "tooth_mm": 0.1,
+            "yoke_mm": 0.1,
+            "coil_inner_r_mm": 0.03,
+            "coil_outer_r_mm": 0.03,
+            "coil_width_mm": 0.03,
+            "coil_height_mm": 0.0,
+            "coil_inner_width_mm": 0.02,
+            "coil_inner_height_mm": 0.02,
+            "magnet_direction_deg": -2.0,
+            "rotor_J": 0.05,
+            "rotor_H": -0.2
+          },
+          "torque_Nm": [
+            0.198632015038275,
+            0.21663064534672422,
+            0.19607511192118726,
+            0.21700872598583454,
+            0.20494309819747394
+          ]
+        }
+      },
+      "remeshed_samples": 0,
+      "samples": 45,
+      "seed_mesh_sha256": [
+        "c3f086e232144ec4e6c09a00b3e2102bc6987fe497ac4e27c79ab9978ed3cbe3",
+        "0580a3b0a1dcb78f5cfe9f9518a326f64171b00b1ef4aef415462ed3cf987eca",
+        "fe23b7888a7b890829c00efd7bdc713a2950482b6c5ecf98954047d5e66b00bb",
+        "825d81693f6c4b63836f0948930dc5fb417355104e928c7b8902d018e32869f8",
+        "1090147f08ca546301073cba9b62e75ee71e097e3cfddb48e15c38fae8c4b80a"
+      ],
+      "seed_step_sha256": "09bcc476249ac7f9793ea6060b47c8fd17ca38c53f57cbddf89ab59efa7713e9"
+    },
+    {
+      "id": "ring",
+      "name": "Steadywin WK4310CH",
+      "label": "Steadywin\nWK4310CH",
+      "od_mm": 47,
+      "overall_length_mm": 14,
+      "envelope_cm3": 24.289223601229487,
+      "nominal_Nm": 0.08082966744255607,
+      "min_Nm": 0.06595152062079893,
+      "max_Nm": 0.09525437102664588,
+      "catalog_Nm": 0.08395,
+      "nominal_inputs": {
+        "turns_per_tooth": 60.0,
+        "Br_T": 0.68,
+        "mur": 1.2,
+        "stack_factor": 0.95
+      },
+      "perturbation_deltas": {
+        "br": [
+          -0.1,
+          0.1
+        ],
+        "mur": [
+          -0.1,
+          0.1
+        ],
+        "stator_J": [
+          -0.05,
+          0.05
+        ],
+        "stator_H": [
+          -0.2,
+          0.2
+        ],
+        "stack": [
+          -0.02,
+          0.02
+        ],
+        "gap_mm": [
+          -0.03,
+          0.03
+        ],
+        "tooth_mm": [
+          -0.1,
+          0.1
+        ],
+        "yoke_mm": [
+          -0.1,
+          0.1
+        ],
+        "coil_inner_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_outer_r_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_width_mm": [
+          -0.03,
+          0.03
+        ],
+        "coil_height_mm": [
+          -0.03,
+          0.0
+        ],
+        "coil_inner_width_mm": [
+          -0.02,
+          0.02
+        ],
+        "coil_inner_height_mm": [
+          -0.02,
+          0.02
+        ],
+        "magnet_direction_deg": [
+          -2.0,
+          2.0
+        ],
+        "pole_transition": [
+          0.0,
+          0.1
+        ]
+      },
+      "nominal_at_zero_Nm": 0.07966621123742633,
+      "endpoint_torque_at_zero_Nm": {
+        "br": [
+          0.07187794550597594,
+          0.0873676096483977
+        ],
+        "mur": [
+          0.08316364794031508,
+          0.07649434150986552
+        ],
+        "stator_J": [
+          0.0795548320965917,
+          0.0797478911519595
+        ],
+        "stator_H": [
+          0.07983569026617363,
+          0.07949826137749633
+        ],
+        "stack": [
+          0.07962377590979311,
+          0.07970338820089728
+        ],
+        "gap_mm": [
+          0.08137628983321255,
+          0.07798858100272173
+        ],
+        "tooth_mm": [
+          0.07956747920404582,
+          0.07974179804568375
+        ],
+        "yoke_mm": [
+          0.07964535507208594,
+          0.0796866950784731
+        ],
+        "coil_inner_r_mm": [
+          0.07966473785656752,
+          0.07966769611049379
+        ],
+        "coil_outer_r_mm": [
+          0.07966600226066667,
+          0.07966657585058493
+        ],
+        "coil_width_mm": [
+          0.07966853022006667,
+          0.07966387758332416
+        ],
+        "coil_height_mm": [
+          0.0796657807414812,
+          0.07966621123742632
+        ],
+        "coil_inner_width_mm": [
+          0.07966605311749272,
+          0.07966633753866965
+        ],
+        "coil_inner_height_mm": [
+          0.07966581642065469,
+          0.07966650941076252
+        ],
+        "magnet_direction_deg": [
+          0.07982092461973055,
+          0.07941103048367845
+        ],
+        "pole_transition": [
+          0.07966621123742633,
+          0.07768795398153759
+        ]
+      },
+      "combined": {
+        "lower": {
+          "mean_Nm": 0.06595152062079893,
+          "change": {
+            "br": -0.1,
+            "mur": 0.1,
+            "stator_J": -0.05,
+            "stator_H": 0.2,
+            "stack": -0.02,
+            "gap_mm": 0.03,
+            "tooth_mm": -0.1,
+            "yoke_mm": -0.1,
+            "coil_inner_r_mm": -0.03,
+            "coil_outer_r_mm": -0.03,
+            "coil_width_mm": 0.03,
+            "coil_height_mm": -0.03,
+            "coil_inner_width_mm": -0.02,
+            "coil_inner_height_mm": -0.02,
+            "magnet_direction_deg": 2.0,
+            "pole_transition": 0.1
+          },
+          "torque_Nm": [
+            0.06530683565624829,
+            0.06649641045853268,
+            0.06514942960426438,
+            0.06580309675893974,
+            0.06700183062600956
+          ]
+        },
+        "upper": {
+          "mean_Nm": 0.09525437102664588,
+          "change": {
+            "br": 0.1,
+            "mur": -0.1,
+            "stator_J": 0.05,
+            "stator_H": -0.2,
+            "stack": 0.02,
+            "gap_mm": -0.03,
+            "tooth_mm": 0.1,
+            "yoke_mm": 0.1,
+            "coil_inner_r_mm": 0.03,
+            "coil_outer_r_mm": 0.03,
+            "coil_width_mm": -0.03,
+            "coil_height_mm": 0,
+            "coil_inner_width_mm": 0.02,
+            "coil_inner_height_mm": 0.02,
+            "magnet_direction_deg": -2.0,
+            "pole_transition": 0
+          },
+          "torque_Nm": [
+            0.09385447852568009,
+            0.09699876144720092,
+            0.09270695409230313,
+            0.09560179824420816,
+            0.09710986282383713
+          ]
+        }
+      },
+      "remeshed_samples": 0,
+      "samples": 43,
+      "seed_mesh_sha256": [
+        "9d67267fa6a170994e8d56531033d5d2f22d75001138bf76239c42512b7cb779",
+        "0becf48b135c7b25ad0b55231704980d080782bfd1f073817b84757594bbb1d6",
+        "efe1c51e5f65a04acb3394d5fc23181e72f799c2409a7d949df48360db4bed89",
+        "37f133123bbea13a2238152832172a308bfe9b9f08617286769c544916f808f2",
+        "6d5b5174f19ffec20472ca95f65959966453f9fa0b69688e145403e047ff45e4"
+      ],
+      "seed_step_sha256": "60721bc8987d972c46a044b743ce519f47284bbb7d23a9ac0ccb4c8ba80c8185"
+    }
+  ]
+}

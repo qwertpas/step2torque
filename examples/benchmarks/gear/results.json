@@ -1,0 +1,813 @@
+{
+  "source": {
+    "title": "Axial Field Magnetic Gear in 3D",
+    "application": 22301,
+    "url": "https://www.comsol.com/model/axial-field-magnetic-gear-in-3d-22301",
+    "download": "https://www.comsol.com/model/download/1484721/axial_field_magnetic_gear_3d.mph",
+    "archive_sha256": "c35eaf8d694f7a3bd236c5a8bf309e8bfe0bdb8b25d3faba830f9e62d0a838d8",
+    "saved_computation": "COMSOL 6.4.0.257",
+    "native_initial_cell_centres_checked": 29714,
+    "geometry_or_polarity_mismatches": 0
+  },
+  "method": {
+    "field": "P2 scalar potential, step2torque",
+    "torque": "Air-volume virtual work, one moving rotor at a time",
+    "reference": "Independent order-2 H(curl) vector potential and clipped-gap Maxwell stress; shared CAD, material laws, NGSolve and linear solver",
+    "boundary": "R=75 mm, z=-20..59 mm, n.B=0",
+    "newton_tolerance_sqrt_j": 1e-09,
+    "final_hessian_floor": 0,
+    "body_mesh_mm": 1.5,
+    "gap_mesh_mm": 0.75,
+    "comparison_tolerance_percent": 1,
+    "angle_relation": "hs_deg=-2.5*ls_deg; no fitted offset",
+    "comsol_transient_ripple_cause": "unresolved"
+  },
+  "independent_max_error_percent": {
+    "hs": {
+      "max_error_percent": 0.7725341445194989
+    },
+    "ls": {
+      "max_error_percent": 0.366859663040231
+    }
+  },
+  "comsol_saved_transient_metrics": {
+    "hs": {
+      "max_error_percent": 20.796410475948335,
+      "rms_error_percent": 12.262683432460735,
+      "computed_peak_to_peak_Nm": 0.3090800168249701,
+      "comsol_peak_to_peak_Nm": 0.5341448991967388,
+      "computed_mean_Nm": -2.3654628397000685,
+      "comsol_mean_Nm": -2.3709705767316263
+    },
+    "ls": {
+      "max_error_percent": 5.779348232672055,
+      "rms_error_percent": 3.168360931964717,
+      "computed_peak_to_peak_Nm": 0.01280268578024657,
+      "comsol_peak_to_peak_Nm": 0.34680887194322274,
+      "computed_mean_Nm": -5.967574001942785,
+      "comsol_mean_Nm": -5.842628726186812
+    }
+  },
+  "polarity_reversal_closure_percent": {
+    "hs": -0.09883265684643705,
+    "ls": 0.0070286681113529426
+  },
+  "convergence": [
+    {
+      "case": "bh-split",
+      "input": {
+        "name": "bh-split",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 8,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.422114015911269,
+      "ls_Nm": -5.968332825375158,
+      "ls_max_H_A_per_m": 168490.0623682652,
+      "elements": 580884,
+      "dofs": 782025,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 10,
+        "decrement_sqrt_j": 5.624020225397795e-13,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.044678338104858994,
+        "factor_s": 0.5737525689182803
+      }
+    },
+    {
+      "case": "initial-coarse",
+      "input": {
+        "name": "initial-coarse",
+        "hs": 0,
+        "ls": 0,
+        "size": 2.5,
+        "gap": 2.0,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "direct"
+      },
+      "hs_Nm": -2.4238980427724166,
+      "ls_Nm": -5.938136539581691,
+      "ls_max_H_A_per_m": 118724.04326387416,
+      "elements": 126919,
+      "dofs": 171421,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 9,
+        "decrement_sqrt_j": 2.1433377720059394e-10,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.024761619977653027,
+        "factor_s": 9.751102227019146
+      }
+    },
+    {
+      "case": "initial-fine",
+      "input": {
+        "name": "initial-fine",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.0,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.4249625712585754,
+      "ls_Nm": -5.972198680245469,
+      "ls_max_H_A_per_m": 209406.1903187852,
+      "elements": 974448,
+      "dofs": 1308515,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 10,
+        "decrement_sqrt_j": 3.2276076854139088e-12,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.12791142100468278,
+        "factor_s": 1.2822947659296915
+      }
+    },
+    {
+      "case": "initial-gap",
+      "input": {
+        "name": "initial-gap",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.422114015911156,
+      "ls_Nm": -5.968332825374442,
+      "ls_max_H_A_per_m": 168490.06236822225,
+      "elements": 580884,
+      "dofs": 782025,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 10,
+        "decrement_sqrt_j": 1.9562334012631254e-12,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.05563091195654124,
+        "factor_s": 1.7281234060646966
+      }
+    },
+    {
+      "case": "initial-gap-finer",
+      "input": {
+        "name": "initial-gap-finer",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 0.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.4238596453812606,
+      "ls_Nm": -5.963471015598509,
+      "ls_max_H_A_per_m": 163925.85926951657,
+      "elements": 1505835,
+      "dofs": 2016752,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 10,
+        "decrement_sqrt_j": 2.66475204539558e-12,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.0756150959059596,
+        "factor_s": 2.5499593620188534
+      }
+    },
+    {
+      "case": "initial-medium",
+      "input": {
+        "name": "initial-medium",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 1.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.424493693271155,
+      "ls_Nm": -5.945219458268667,
+      "ls_max_H_A_per_m": 164361.7965618449,
+      "elements": 253226,
+      "dofs": 341669,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 10,
+        "decrement_sqrt_j": 1.4736609128599996e-12,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.0475083680357784,
+        "factor_s": 0.23038065701257437
+      }
+    },
+    {
+      "case": "outer-125",
+      "input": {
+        "name": "outer-125",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 125.0,
+        "padding": 70.0,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.4055649989571224,
+      "ls_Nm": -5.9187242402622395,
+      "ls_max_H_A_per_m": 132720.966541133,
+      "elements": 830653,
+      "dofs": 1115728,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 9,
+        "decrement_sqrt_j": 4.401058693366568e-10,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.05867491499520838,
+        "factor_s": 2.3362360630417243
+      }
+    },
+    {
+      "case": "outer-200",
+      "input": {
+        "name": "outer-200",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 200.0,
+        "padding": 145.0,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.4052647418724455,
+      "ls_Nm": -5.913696523550931,
+      "ls_max_H_A_per_m": 149072.6789605625,
+      "elements": 730778,
+      "dofs": 981221,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 9,
+        "decrement_sqrt_j": 4.929064504345028e-10,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.0607816498959437,
+        "factor_s": 0.9015153010841459
+      }
+    },
+    {
+      "case": "pose-01-fine",
+      "input": {
+        "name": "pose-01-fine",
+        "hs": -9.0,
+        "ls": 3.6,
+        "size": 1.0,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 4,
+        "method": "cuda"
+      },
+      "hs_Nm": -2.23425364083693,
+      "ls_Nm": -5.979049495259545,
+      "ls_max_H_A_per_m": 240596.1260503573,
+      "elements": 978199,
+      "dofs": 1313542,
+      "final_newton": {
+        "case": 0,
+        "stage": 1,
+        "iteration": 11,
+        "decrement_sqrt_j": 1.1561276636881487e-12,
+        "hessian_floor": 0.0,
+        "assembly_s": 0.15906874393112957,
+        "factor_s": 2.025871240068227
+      }
+    }
+  ],
+  "reference_convergence": [
+    {
+      "case": "initial-coarse",
+      "input": {
+        "name": "initial-coarse",
+        "hs": 0,
+        "ls": 0,
+        "size": 2.5,
+        "gap": 2.0,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8
+      },
+      "dofs": 658913,
+      "hs_Nm": -2.4342670803626363,
+      "ls_Nm": -5.999895913498122,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 2.398163072166921e-12
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.837375276016246e-14,
+        "ls": 2.1582735598713043e-13
+      }
+    },
+    {
+      "case": "initial-gap",
+      "input": {
+        "name": "initial-gap",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3007085,
+      "hs_Nm": -2.4310531370268906,
+      "ls_Nm": -5.987328402748952,
+      "final_newton": {
+        "iteration": 10,
+        "decrement_sqrt_j": 1.4815358689216557e-11
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.704148513061227e-14,
+        "ls": 2.1671553440683056e-13
+      }
+    },
+    {
+      "case": "initial-medium",
+      "input": {
+        "name": "initial-medium",
+        "hs": 0,
+        "ls": 0,
+        "size": 1.5,
+        "gap": 1.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 1312436,
+      "hs_Nm": -2.437132986708675,
+      "ls_Nm": -6.014399027339415,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 5.655516287821857e-10
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.837375276016246e-14,
+        "ls": 2.1671553440683056e-13
+      }
+    },
+    {
+      "case": "pose-01",
+      "input": {
+        "name": "pose-01",
+        "hs": -9.0,
+        "ls": 3.6,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3015935,
+      "hs_Nm": -2.2462277875219434,
+      "ls_Nm": -5.991783144214935,
+      "final_newton": {
+        "iteration": 10,
+        "decrement_sqrt_j": 1.502417450943504e-11
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.038014698286133e-14,
+        "ls": 2.1582735598713043e-13
+      }
+    },
+    {
+      "case": "pose-02",
+      "input": {
+        "name": "pose-02",
+        "hs": -18.0,
+        "ls": 7.2,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3009677,
+      "hs_Nm": -2.444601374916358,
+      "ls_Nm": -5.982617127028013,
+      "final_newton": {
+        "iteration": 22,
+        "decrement_sqrt_j": 9.760200541013297e-10
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.837375276016246e-14,
+        "ls": 2.1671553440683056e-13
+      }
+    },
+    {
+      "case": "pose-04",
+      "input": {
+        "name": "pose-04",
+        "hs": -36.0,
+        "ls": 14.4,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3007915,
+      "hs_Nm": -2.259893848386282,
+      "ls_Nm": -5.98900819210216,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 3.4437837499253723e-10
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.171241461241152e-14,
+        "ls": 2.1582735598713043e-13
+      }
+    },
+    {
+      "case": "pose-06",
+      "input": {
+        "name": "pose-06",
+        "hs": -54.0,
+        "ls": 21.6,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3013140,
+      "hs_Nm": -2.5510204025275316,
+      "ls_Nm": -5.979479221308293,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 2.339552821329675e-10
+      },
+      "quadrature_difference_Nm": {
+        "hs": 9.103828801926284e-14,
+        "ls": 2.1582735598713043e-13
+      }
+    },
+    {
+      "case": "pose-08",
+      "input": {
+        "name": "pose-08",
+        "hs": -72.0,
+        "ls": 28.8,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3010954,
+      "hs_Nm": -2.2860747405422557,
+      "ls_Nm": -5.985536477518175,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 3.316843339532149e-10
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.260059303211165e-14,
+        "ls": 2.1405099914773018e-13
+      }
+    },
+    {
+      "case": "pose-10",
+      "input": {
+        "name": "pose-10",
+        "hs": -90.0,
+        "ls": 36.0,
+        "size": 1.5,
+        "gap": 0.75,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 8,
+        "method": "cuda"
+      },
+      "dofs": 3003378,
+      "hs_Nm": -2.4324490036760107,
+      "ls_Nm": -5.985930350353502,
+      "final_newton": {
+        "iteration": 10,
+        "decrement_sqrt_j": 1.8910316521491194e-11
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.79296635503124e-14,
+        "ls": 2.1582735598713043e-13
+      }
+    },
+    {
+      "case": "reference-pose-01",
+      "input": {
+        "name": "reference-pose-01",
+        "hs": -9,
+        "ls": 3.6,
+        "size": 1.5,
+        "gap": 1.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 4,
+        "method": "cuda"
+      },
+      "dofs": 1312811,
+      "hs_Nm": -2.2543467658024867,
+      "ls_Nm": -5.999006552994389,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 3.3241534206051195e-11
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.260059303211165e-14,
+        "ls": 2.1582735598713043e-13
+      }
+    },
+    {
+      "case": "reference-pose-02",
+      "input": {
+        "name": "reference-pose-02",
+        "hs": -18,
+        "ls": 7.2,
+        "size": 1.5,
+        "gap": 1.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 4,
+        "method": "cuda"
+      },
+      "dofs": 1308117,
+      "hs_Nm": -2.4521834909347615,
+      "ls_Nm": -5.997969320990569,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 1.392380605335089e-10
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.837375276016246e-14,
+        "ls": 2.184918912462308e-13
+      }
+    },
+    {
+      "case": "reference-pose-04",
+      "input": {
+        "name": "reference-pose-04",
+        "hs": -36,
+        "ls": 14.4,
+        "size": 1.5,
+        "gap": 1.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 4,
+        "method": "cuda"
+      },
+      "dofs": 1311792,
+      "hs_Nm": -2.268149783094301,
+      "ls_Nm": -6.0002559512095415,
+      "final_newton": {
+        "iteration": 10,
+        "decrement_sqrt_j": 4.93985461737876e-12
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.215650382226158e-14,
+        "ls": 2.184918912462308e-13
+      }
+    },
+    {
+      "case": "reference-pose-08",
+      "input": {
+        "name": "reference-pose-08",
+        "hs": -72,
+        "ls": 28.8,
+        "size": 1.5,
+        "gap": 1.5,
+        "radius": 75,
+        "padding": 20,
+        "boundary": "insulation",
+        "subdivide": 1,
+        "threads": 4,
+        "method": "cuda"
+      },
+      "dofs": 1310131,
+      "hs_Nm": -2.293235403197754,
+      "ls_Nm": -6.01820937073451,
+      "final_newton": {
+        "iteration": 9,
+        "decrement_sqrt_j": 3.6250437894707286e-12
+      },
+      "quadrature_difference_Nm": {
+        "hs": 8.393286066166183e-14,
+        "ls": 2.1938006966593093e-13
+      }
+    }
+  ],
+  "checks": {
+    "cad_volume_max_relative_error": 9.352518759442319e-13,
+    "bh_interpolation_max_difference_T": 3.552713678800501e-15,
+    "comparison": {
+      "tolerance_percent": 1.0,
+      "passed": true,
+      "relative_errors_percent": {
+        "initial-gap": {
+          "hs": 0.36770570661679436,
+          "ls": 0.31726299438976646
+        },
+        "pose-01": {
+          "hs": 0.6704364157182563,
+          "ls": 0.366859663040231
+        },
+        "pose-02": {
+          "hs": 0.5277241856237125,
+          "ls": 0.3078293083496053
+        },
+        "pose-04": {
+          "hs": 0.7725341445194989,
+          "ls": 0.2717623792107826
+        },
+        "pose-06": {
+          "hs": 0.4222673890602713,
+          "ls": 0.3269446287345379
+        },
+        "pose-08": {
+          "hs": 0.6658403284283132,
+          "ls": 0.2717910419139713
+        },
+        "pose-10": {
+          "hs": 0.5232926725038611,
+          "ls": 0.28697344719305073
+        }
+      },
+      "closure_percent": {
+        "hs": 0.09883265684643705,
+        "ls": 0.0070286681113529426
+      },
+      "outer_last_change_percent": {
+        "hs": 0.012483327903578534,
+        "ls": 0.08501817249644272
+      },
+      "bh_torque_difference_Nm": {
+        "hs": 1.127986593019159e-13,
+        "ls": 7.158718062783009e-13
+      }
+    }
+  },
+  "solver_sha256": {
+    "solution.py": "052a74e1d28fa892ae0b73dd4c3d5b6d8ffd27bffce3a2ce9981680a560752ca",
+    "_assembly.cpython-312-x86_64-linux-gnu.so": "310deded4441e79fcba3dc33d266742285d7057c2b9fdb848a2025b39e28cbbf",
+    "_assembly_version.py": "554ccdd6348246aaeb9e4e9c979e7261722447d3a64b8a89f77da7f3beb3d8c4",
+    "_assembly.cpp": "3d2bced52fdc2443a3151f191a8f8c033d293756998463f17e1375dc1bcbfa5f",
+    "_mesh.py": "43f071d7f9d90472a0f67fad66dca372fba62720e45e28e02590bd4bf0c667db",
+    "_torque.py": "953c27e8393fdadfd4198a0ee5ecc51c527787e5dbd0ade74b887af39c2a905a",
+    "_worker.py": "0621c2d085dbcf08ba2ae473bc2ec84ee416846547791ada7bb49ec0b8cc6774",
+    "_cuda.py": "ccacc7eea660f43b72b931afd4d2bab367ffa26e4d8053cdc218881a1951455f",
+    "_currents.py": "676916ca05949c23f63363e665b4216dda63ac5ca6cbea7195453c11b5509837",
+    "_field.py": "d24ea58e3a55528f2b375c1716dc701016dfbbccae20b712f5937c1fd8553d1d",
+    "_kernel.py": "51738e39e6d1096d1bedc3e950a25e6be8b8726c13eb1391004798a281634042",
+    "_source.py": "b32afb90a4052bdd6a1744cfcfec4058de787c1cdd36e14d53388bbfb79b66a2",
+    "_results.py": "93472d656cc912040ec0e7492d1ff1cb1e9e4aacf27a4f8ab65c49c1f19ee393",
+    "_motion.py": "d1ea23f04925ab81df00dee36e9627bb8171dbd302ff4fd544aa15534b6b0049",
+    "model.py": "aeea5ba748cbe759bb9ea66430a2a30465256a6ac5787fe01d0bfd16686d9525",
+    "__init__.py": "d8d48f53bdf5bbe53fa3c9e897ca80a088237614674c757c2b9db97b78fe755f"
+  },
+  "field": {
+    "case": "initial-gap",
+    "plane_deg": 12.857142857142858,
+    "streamlines": "projected B in the radial/z plane",
+    "heatmap": "full 3D |B|",
+    "azimuthal_scale_T": [
+      -0.35,
+      0.35
+    ],
+    "sampled_max_B_T": 2.9831491542365205,
+    "sampled_max_abs_azimuthal_T": 2.908129710874819
+  },
+  "inputs_sha256": {
+    "gear.step": "a9c1ec79a8ad150b5cb682f73a5a63e4e26af0454ede96d34fa9af10ea51c21f",
+    "bh.csv": "fdd14a01fdaeeff764a28ba91a3e08046dffa9fc599d85624e64d92963b81704",
+    "comsol.csv": "2c4113396febb17cc352815c52ce4b96f79241c79282704c41d6b3da0365bd02",
+    "reference.csv": "123534bb3ce8cc3779f19dbb79aec1cfb516fdcc02534c45a628101f5c5071c9",
+    "comparison.csv": "71f71e660751559f9115eab2e7a65c45d41bc9580351878d0af8e0a594adda80"
+  },
+  "integration": {
+    "package_source_modified": false,
+    "initial_pose": {
+      "hs_Nm": -2.422114015911057,
+      "ls_Nm": -5.968332825374458,
+      "elapsed_s": 121.06935863301624
+    },
+    "ab72_relative_error": 0.0,
+    "independent_reference_initial_Nm": {
+      "hs": -2.431053137026773,
+      "ls": -5.987328402749167
+    },
+    "solver_sha256": {
+      "solution.py": "5ca74f478059a38c5860292341ffc33794ed0298cd1b38f45658705a72bce981",
+      "_assembly.cpython-312-x86_64-linux-gnu.so": "310deded4441e79fcba3dc33d266742285d7057c2b9fdb848a2025b39e28cbbf",
+      "_assembly_version.py": "554ccdd6348246aaeb9e4e9c979e7261722447d3a64b8a89f77da7f3beb3d8c4",
+      "_assembly.cpp": "3d2bced52fdc2443a3151f191a8f8c033d293756998463f17e1375dc1bcbfa5f",
+      "_mesh.py": "3ab573d219f70977e1ac2a36219d2eeb0dd345ed9ae5d0f7c5cb6c23b4b77951",
+      "_torque.py": "953c27e8393fdadfd4198a0ee5ecc51c527787e5dbd0ade74b887af39c2a905a",
+      "_worker.py": "83714b70d21fc5aaba1635be7c2158f6a7e098d9019fe4ddcbacdda488fff874",
+      "_cuda.py": "ccacc7eea660f43b72b931afd4d2bab367ffa26e4d8053cdc218881a1951455f",
+      "_currents.py": "676916ca05949c23f63363e665b4216dda63ac5ca6cbea7195453c11b5509837",
+      "_field.py": "5446f092bd9eeafa5e7fc08083db57c8ca82c7dad82fec1c295f7d17b45424da",
+      "_kernel.py": "51738e39e6d1096d1bedc3e950a25e6be8b8726c13eb1391004798a281634042",
+      "_source.py": "b32afb90a4052bdd6a1744cfcfec4058de787c1cdd36e14d53388bbfb79b66a2",
+      "_contact.py": "dbc10052ddf2ed06554e7bcaeb948a1f190cda482d2f9dc22b8e665668683f4f",
+      "_results.py": "93472d656cc912040ec0e7492d1ff1cb1e9e4aacf27a4f8ab65c49c1f19ee393",
+      "_motion.py": "d1ea23f04925ab81df00dee36e9627bb8171dbd302ff4fd544aa15534b6b0049",
+      "model.py": "e0c6c97a979b4d7bfa707a993f646ad5dc775607472c5cceb0cdaa38ca57acc3",
+      "__init__.py": "d8d48f53bdf5bbe53fa3c9e897ca80a088237614674c757c2b9db97b78fe755f"
+    },
+    "physical_tests_passed": 16,
+    "verified_poses": 7,
+    "max_error_percent": {
+      "hs": 0.7725341446308431,
+      "ls": 0.3668596635382215
+    },
+    "closure_percent": {
+      "hs": 0.0988326568422071,
+      "ls": 0.0070286681147280206
+    },
+    "max_difference_from_evaluation_Nm": {
+      "hs": 2.6422419807659026e-11,
+      "ls": 5.5564441936439835e-11
+    },
+    "elapsed_s": 886.4536415989278
+  }
+}

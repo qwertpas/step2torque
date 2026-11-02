@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools", "pybind11"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "step2torque"
+version = "0.1.0"
+description = "STEP assemblies to nonlinear 3D motor torque, from Python."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = ["ngsolve>=6.2.2608", "numpy>=1.26", "scipy>=1.12", "psutil>=5.9", "matplotlib>=3.8"]
+
+[project.optional-dependencies]
+cuda = ["nvmath-python[cu12]", "nvidia-cudss-cu12", "cupy-cuda12x"]
+test = ["pytest", "build", "ruff"]
+
+[project.urls]
+Repository = "https://github.com/qwertpas/step2torque"
+Viewer = "https://qwertpas.github.io/step2torque/"
+
+[project.scripts]
+step2torque-view = "step2torque.visualization.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+step2torque = ["materials/*.csv", "materials/*.json", "*.cpp", "*.hpp"]
+"step2torque.visualization" = ["*.html", "*.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "simple",
+    "label": "Six-coil inrunner",
+    "path": "simple.s2t"
+  },
+  {
+    "id": "tq",
+    "label": "TQ ILM50x14",
+    "path": "tq.s2t"
+  },
+  {
+    "id": "mosrac",
+    "label": "Mosrac U5019",
+    "path": "mosrac.s2t"
+  },
+  {
+    "id": "kollmorgen",
+    "label": "Kollmorgen TBM2G-05013A",
+    "path": "kollmorgen.s2t"
+  },
+  {
+    "id": "cubemars",
+    "label": "CubeMars RI60 KV120",
+    "path": "cubemars.s2t"
+  },
+  {
+    "id": "steadywin-segmented",
+    "label": "Steadywin WK4310 \u00b7 Segmented",
+    "path": "steadywin-segmented.s2t"
+  },
+  {
+    "id": "steadywin-ring",
+    "label": "Steadywin WK4310 \u00b7 Bonded ring",
+    "path": "steadywin-ring.s2t"
+  },
+  {
+    "id": "analytic-sphere",
+    "label": "Analytic sphere",
+    "path": "analytic-sphere.s2t"
+  },
+  {
+    "id": "analytic-ring",
+    "label": "Analytic two-pole ring",
+    "path": "analytic-ring.s2t"
+  },
+  {
+    "id": "reluctance-0p5",
+    "label": "Reluctance \u00b7 0.5 A",
+    "path": "reluctance-0p5.s2t"
+  },
+  {
+    "id": "reluctance-4p0",
+    "label": "Reluctance \u00b7 4 A",
+    "path": "reluctance-4p0.s2t"
+  },
+  {
+    "id": "lrk",
+    "label": "LRK periodic 3D reference",
+    "path": "lrk.s2t"
+  },
+  {
+    "id": "axial",
+    "label": "Unrolled axial reference",
+    "path": "axial.s2t"
+  }
+]

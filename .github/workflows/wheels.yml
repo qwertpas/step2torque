@@ -1,0 +1,27 @@
+name: Wheels
+on: [workflow_dispatch, workflow_call]
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pypa/cibuildwheel@v3
+        env:
+          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
+          CIBW_SKIP: "*-musllinux_*"
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_ARCHS_WINDOWS: AMD64
+          CIBW_ARCHS_MACOS: universal2
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: "python -m pytest {project}/tests -q"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl

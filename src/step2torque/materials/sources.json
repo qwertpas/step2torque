@@ -1,0 +1,15 @@
+{
+  "1J22": {
+    "url": "https://www.kedemagnetics.com/download/datasheet-of-soft-magnetic-materials-at-room-temperature.pdf",
+    "data": "Cold-rolled strip minimum induction values at room temperature, H=400..8000 A/m. Monotone linear interpolation, vacuum-slope high-field tail. No assumed temperature derating."
+  },
+  "kede_1j21": {
+    "url": "https://kedemagnetics.en.made-in-china.com/product/GZpAQiyOHJWh/China-1j22-Soft-Magnetic-Material-Feco50-Alloys-Hiperco50-Supermendur-Lamination-Magnets-for-Motor.html",
+    "data": "Historical motor-study curve, including its assumed 5% polarization reduction. Retained explicitly for reproduction; distinct from the official 1J22 curve."
+  },
+  "steel": {"data": "Historical motor-study 1018 steel table; assumed material, not measured stock."},
+  "DT4": {
+    "url": "https://www.ijsimm.com/Full_Papers/Fulltext2020/text19-4_CO18.pdf",
+    "data": "Historical motor-study DT4 table, including assumed polarization derating."
+  }
+}

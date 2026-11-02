@@ -1,0 +1,3 @@
+src/step2torque/visualization/viewer.js -diff
+*.step -diff -text -whitespace
+viewer/tests/parity.json -diff

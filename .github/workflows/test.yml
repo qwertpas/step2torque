@@ -1,0 +1,40 @@
+name: Test
+on: [push, pull_request, workflow_dispatch, workflow_call]
+permissions:
+  contents: read
+jobs:
+  viewer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: viewer
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: viewer/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npm run test:site
+  cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python3 -m pip install '.[test]'
+      - run: ruff check src tests examples
+      - run: python3 -m pytest -q
+      - run: python3 examples/simple/run.py
+      - run: python3 examples/benchmarks/lrk/run.py --cpu
+      - run: python3 examples/benchmarks/axial/run.py --cpu
+      - run: python3 examples/benchmarks/analytic/run.py
+      - run: python3 -m build
+
