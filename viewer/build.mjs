@@ -24,11 +24,12 @@ const catalog = JSON.parse(await fs.readFile(path.join(root, "examples/catalog.j
 await fs.rm(output, { recursive: true, force: true });
 await fs.mkdir(path.join(output, "examples"), { recursive: true });
 const examples = [];
-for (const item of catalog) {
+// Keep the setup preview directly accessible outside the examples dropdown.
+for (const item of [...catalog, { id: "simple-setup", path: "simple-setup.s2t" }]) {
   const file = "examples/" + item.id + ".html";
   const data = await fs.readFile(path.join(root, "examples", item.path));
   await fs.writeFile(path.join(output, file), template.replace("__DATA__", () => data.toString("base64")));
-  examples.push({ label: item.label, file });
+  if (item.label) examples.push({ label: item.label, file });
 }
 
 const site = await build({ ...options, entryPoints: ["src/site.js"] });

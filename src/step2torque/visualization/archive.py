@@ -52,7 +52,12 @@ def pack(
 ):
     if mode not in ("2d", "3d"):
         raise ValueError("mode must be 2d or 3d")
-    if metric not in ("flux", "loading"):
+    if not field.solved and mode != "3d":
+        raise ValueError("Unsolved setups use the 3D view")
+    metric = ("flux" if metric is None else metric) if field.solved else metric
+    if not field.solved and metric is not None:
+        raise ValueError("Flux and steel loading require a solved field")
+    if field.solved and metric not in ("flux", "loading"):
         raise ValueError("metric must be flux or loading")
     if metric == "loading" and not any(m["reference_T"] for m in field.materials):
         raise ValueError("Steel loading needs a nonlinear steel B-H curve")
@@ -69,9 +74,7 @@ def pack(
         ):
             raise ValueError("bounds must be finite (left, bottom, right, top)")
         bounds = bounds.tolist()
-    h = field.vertex_fields()
-    order, boxes, nodes = hierarchy(field.points, field.cells)
-    high = vmax if vmax is not None else (100 if metric == "loading" else flux_max)
+    high = (vmax if vmax is not None else (100 if metric == "loading" else flux_max)) if field.solved else None
     arrays, parts, offset = {}, [], 0
 
     def add(name, values, dtype):
@@ -86,11 +89,14 @@ def pack(
         offset += values.nbytes
 
     add("points", field.points, "<f4")
-    add("cells", field.cells[order], "<u4")
-    add("h", h[order], "<f4")
-    add("material", field.cell_material[order], "<u2")
-    add("bounds", boxes, "<f4")
-    add("nodes", nodes, "<i4")
+    if field.solved:
+        h = field.vertex_fields()
+        order, boxes, nodes = hierarchy(field.points, field.cells)
+        add("cells", field.cells[order], "<u4")
+        add("h", h[order], "<f4")
+        add("material", field.cell_material[order], "<u2")
+        add("bounds", boxes, "<f4")
+        add("nodes", nodes, "<i4")
     surfaces = []
     for i, surface in enumerate(field.surfaces):
         name = f"surface{i}"
@@ -101,15 +107,19 @@ def pack(
                 kind=surface["kind"],
                 array=name,
                 pole=magnet_style(field, surface),
+                rotating=surface.get("rotating", False),
             )
         )
     meta = dict(
         format="step2torque-field",
         version=1,
-        units=dict(position="mm", h="A/m", b="T"),
+        solved=field.solved,
+        units=dict(position="mm", h="A/m", b="T") if field.solved else dict(position="mm"),
         arrays=arrays,
         materials=field.materials,
         surfaces=surfaces,
+        coils=field.coils,
+        current_flow=getattr(field, "meta", {}).get("current_flow", False),
         sectors=field.sectors,
         sector_start_rad=field.info["sector_start_rad"],
         box=field.bounds.tolist(),
@@ -118,7 +128,7 @@ def pack(
         plane=asdict(plane),
         metric=metric,
         air=bool(air),
-        lines=bool(lines),
+        lines=bool(lines) if field.solved else False,
         vmax=high,
         flux_max=flux_max,
         density=density,
@@ -129,6 +139,8 @@ def pack(
         mode=mode,
         bounds=bounds,
     )
+    if not field.solved:
+        meta["components"] = field.spec["components"]
     header = json.dumps(meta, separators=(",", ":"), allow_nan=False).encode()
     prefix = MAGIC + struct.pack("<I", len(header)) + header
     prefix += bytes((-len(prefix)) % 4)

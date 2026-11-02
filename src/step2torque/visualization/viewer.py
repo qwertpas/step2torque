@@ -35,21 +35,32 @@ class Section:
 
 
 class Viewer:
-    """Read a Solution, saved directory or portable .s2t file. No solve is launched.
+    """View a configured Motor, Solution, saved directory or portable .s2t file.
 
+    Unsolved motors use 1 A per phase unless current= supplies preview inputs.
+    angle= sets their initial mechanical angle. No solve is launched.
     Plane coordinates are relative to the saved motor center and shaft axis.
     sample(..., world=True) accepts original CAD coordinates instead.
     """
 
-    def __init__(self, solution):
+    def __init__(self, solution, *, angle=0, current=None):
+        from ..model import Motor
+        from .setup import MotorGeometry
+
         path = getattr(solution, "path", solution)
-        if isinstance(solution, (NativeField, PackedField)):
+        if isinstance(solution, Motor):
+            self.field = MotorGeometry(solution, angle=angle, current=current)
+        elif angle != 0 or current is not None:
+            raise ValueError("angle and current preview inputs require a Motor")
+        elif isinstance(solution, (NativeField, PackedField)):
             self.field = solution
         elif Path(path).is_file():
             self.field = PackedField(path)
         else:
             self.field = NativeField(solution)
-        if isinstance(self.field, PackedField):
+        if not self.field.solved:
+            self.flux_max = None
+        elif isinstance(self.field, PackedField):
             self.flux_max = self.field.meta["flux_max"]
         else:
             ids = np.arange(
@@ -74,6 +85,8 @@ class Viewer:
         )
 
     def sample(self, points_mm, *, world=False):
+        if not self.field.solved:
+            raise ValueError("Motor is unsolved")
         return self.field.sample(points_mm, world=world)
 
     def section(self, plane=None, *, resolution=600, bounds=None):
@@ -82,6 +95,8 @@ class Viewer:
         bounds=(left, bottom, right, top) uses plane coordinates in mm.
         resolution is the number of samples on the longer edge.
         """
+        if not self.field.solved:
+            raise ValueError("Motor is unsolved")
         plane = plane or Plane.axial()
         if not isinstance(resolution, int) or resolution < 16:
             raise ValueError("resolution must be an integer of at least 16")
@@ -115,7 +130,7 @@ class Viewer:
         path,
         *,
         plane=None,
-        metric="flux",
+        metric=None,
         air=False,
         lines=True,
         vmax=None,
@@ -128,6 +143,13 @@ class Viewer:
 
         Streamlines trace B projected into this plane; colour always uses |B|.
         """
+        if not self.field.solved:
+            from .setup import write_image
+
+            if metric is not None:
+                raise ValueError("Flux and steel loading require a solved field")
+            return write_image(self.field, path, dpi=dpi)
+        metric = "flux" if metric is None else metric
         from matplotlib.backends.backend_agg import FigureCanvasAgg
         from matplotlib.collections import LineCollection
         from matplotlib.colors import LinearSegmentedColormap
@@ -229,7 +251,7 @@ class Viewer:
         path,
         *,
         plane=None,
-        metric="flux",
+        metric=None,
         air=False,
         lines=True,
         vmax=None,
@@ -237,7 +259,7 @@ class Viewer:
         mode="3d",
         bounds=None,
     ):
-        """Export one offline HTML with the 3D field and adjustable section."""
+        """Export one offline HTML with geometry, sections and any solved field."""
         from .html import write_html
 
         return write_html(
@@ -259,7 +281,7 @@ class Viewer:
         path,
         *,
         plane=None,
-        metric="flux",
+        metric=None,
         air=False,
         lines=True,
         vmax=None,
@@ -267,7 +289,7 @@ class Viewer:
         mode="3d",
         bounds=None,
     ):
-        """Export one .s2t file with the complete 3D field and material laws."""
+        """Export a portable .s2t setup or solved field."""
         from .archive import pack
 
         data = pack(

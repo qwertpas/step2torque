@@ -26,6 +26,15 @@ try {
     await page.selectOption("#example", example.file);
     await frame.waitForURL(url => url.pathname.endsWith("/" + example.file));
     await settle(frame);
+    if (!await frame.evaluate(() => motorField.solved)) {
+      assert.ok(await frame.locator("#rotationControl").isVisible());
+      assert.ok(await frame.locator("#current").isChecked());
+      assert.equal(await frame.locator("#metric").isVisible(), false);
+      assert.equal(await frame.locator(".phase-label").count(), 6);
+      report.push({ label: example.label, solved: false });
+      console.log(example.label, "geometry and phase labels");
+      continue;
+    }
     const state = await frame.evaluate(() => {
       const s = motorField.section;
       let finite = 0, maximum = 0;

@@ -26,12 +26,12 @@
   },
   {
     "id": "steadywin-segmented",
-    "label": "Steadywin WK4310 \u00b7 Segmented",
+    "label": "Steadywin WK4310 · Segmented",
     "path": "steadywin-segmented.s2t"
   },
   {
     "id": "steadywin-ring",
-    "label": "Steadywin WK4310 \u00b7 Bonded ring",
+    "label": "Steadywin WK4310 · Bonded ring",
     "path": "steadywin-ring.s2t"
   },
   {
@@ -40,28 +40,18 @@
     "path": "analytic-sphere.s2t"
   },
   {
-    "id": "analytic-ring",
-    "label": "Analytic two-pole ring",
-    "path": "analytic-ring.s2t"
+    "id": "double-sphere",
+    "label": "Exact 3D sphere interaction",
+    "path": "double-sphere.s2t"
   },
   {
-    "id": "reluctance-0p5",
-    "label": "Reluctance \u00b7 0.5 A",
-    "path": "reluctance-0p5.s2t"
+    "id": "team20",
+    "label": "TEAM 20 · 5000 A·turn",
+    "path": "team20.s2t"
   },
   {
-    "id": "reluctance-4p0",
-    "label": "Reluctance \u00b7 4 A",
-    "path": "reluctance-4p0.s2t"
-  },
-  {
-    "id": "lrk",
-    "label": "LRK periodic 3D reference",
-    "path": "lrk.s2t"
-  },
-  {
-    "id": "axial",
-    "label": "Unrolled axial reference",
-    "path": "axial.s2t"
+    "id": "comsol-gear",
+    "label": "COMSOL axial magnetic gear",
+    "path": "comsol-gear.s2t"
   }
 ]

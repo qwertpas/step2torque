@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test tests/field.test.js",
+    "test": "node --test tests/field.test.js tests/current.test.js",
+    "test:current": "node tests/current.js",
+    "test:setup": "node tests/setup.js",
     "test:browser": "node tests/browser.js ../build/site/examples/mosrac.html tests/parity.json",
     "test:site": "node tests/site.js ../build/site/index.html"
   },

@@ -59,7 +59,7 @@ The step2torque simulator is benchmarked on publicly available models as a sanit
 
 6 radial flux motors are evaluated in step2torque and compared to the torque calculated from their catalog specifications. Comparisons use **5.5 W total copper loss at 20°C**. Catalog torques are converted to this loss using the current and resistance assumptions, as detailed in each case README.
 
-| Model / field | Motor and sources | Catalog equivalent, N·m | Simulated, N·m | Difference | Solve time |
+| Model / field | Motor and sources | Catalog equivalent, N·m | Simulated, N·m | Difference | Solve time\* |
 |---|---|---:|---:|---:|---:|
 | <img src="commercial/tq/model-3d.png" width="240" alt="tq 3D model"> <img src="commercial/tq/field.png" width="240" alt="tq field"> | [TQ ILM50x14](commercial/tq/README.md) · [Original source](https://www.tq-group.com/filedownloads/files/products/robodrive/extended_data-sheets/DRVA_DB-ILM-Kits_ILM50x14_Rev201.pdf) | 0.31895 | 0.31612 | -0.9% | 2 min 58 s<br>GPU, 4 CPU threads |
 | <img src="commercial/mosrac/model-3d.png" width="240" alt="mosrac 3D model"> <img src="commercial/mosrac/field.png" width="240" alt="mosrac field"> | [Mosrac U5019](commercial/mosrac/README.md) · [Original source](https://www.mosrac.com/products/frameless-direct-drive-torque-motors/u50-series.html) | 0.25952 | 0.24661 | -5.0% | 2 min 55 s<br>GPU, 4 CPU threads |
@@ -68,8 +68,9 @@ The step2torque simulator is benchmarked on publicly available models as a sanit
 | <img src="commercial/steadywin/model-3d.png" width="240" alt="steadywin 3D model"> <img src="commercial/steadywin/field.png" width="240" alt="steadywin field"> | [Steadywin WK4310: segmented magnets](commercial/steadywin/README.md) · [Original source](https://steadywin-motor.com/products/wholesale-mini-size-11mm-dc-brushless-frameless-motor-for-gimbal-camera) | 0.16791 | 0.18038 | +7.4% | 1 min 52 s<br>GPU, 8 CPU threads |
 | <img src="commercial/steadywin/ring-model-3d.png" width="240" alt="steadywin 3D model"> <img src="commercial/steadywin/ring.png" width="240" alt="steadywin field"> | [Steadywin WK4310CH: bonded ring](commercial/steadywin/README.md) · [Original source](https://steadywin-motor.com/products/wholesale-mini-size-11mm-dc-brushless-frameless-motor-for-gimbal-camera) | 0.08395 | 0.08083 | -3.7% | 1 min 40 s<br>GPU, 8 CPU threads |
 
-Recorded wall times on an **AMD EPYC 7J13 / NVIDIA A100 40 GB**.
+\* Recorded wall times on an AMD EPYC 7J13 / NVIDIA A100 40 GB.
 
+### Parameter uncertainty
 <img src="commercial/torque.png" height="400" alt="Torque versus envelope volume with parameter uncertainty">
 
 

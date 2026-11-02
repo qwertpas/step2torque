@@ -6,24 +6,34 @@
 <style>
 *{box-sizing:border-box}body{margin:0;color:#263244;background:white;font:13px system-ui,sans-serif}button,input,select{font:inherit;color:inherit}button,select,input[type=number]{border:1px solid #d6dce3;background:white;border-radius:5px;min-height:30px}button{padding:4px 10px;cursor:pointer}button[aria-pressed=true]{background:#243e66;color:white;border-color:#243e66}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #417fc5;outline-offset:2px}button:disabled{opacity:.5;cursor:wait}select{padding:3px 6px}input[type=number]{width:68px;padding:3px 5px}input[type=range]{width:94px;accent-color:#345e93;margin:0}input[type=checkbox]{accent-color:#345e93}label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}#toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;border-bottom:1px solid #e5e9ee;position:relative;z-index:2;background:white}.pair{display:inline-flex;gap:2px}.control{display:flex;align-items:center;gap:5px}.unit{color:#697586}#stage{position:relative;width:100%;height:calc(100dvh - 54px);min-height:320px;overflow:hidden}#flat,#three{display:block;width:100%;height:100%;touch-action:none}#three{position:absolute;inset:0}#three[hidden],#flat[hidden],[hidden]{display:none!important}#legend{position:absolute;right:20px;bottom:20px;width:190px;height:54px;background:#fffffff0;border-radius:5px;pointer-events:none}#status{position:absolute;left:18px;bottom:18px;max-width:calc(100% - 240px);font-size:12px;color:#526173;background:#fffffff0;padding:3px 5px;border-radius:3px;pointer-events:none}#export{margin-left:auto}#busy{position:absolute;inset:0;display:grid;place-items:center;background:#ffffffd9;font-size:14px;z-index:4}#busy[hidden]{display:none}@media(max-width:760px){#toolbar{gap:7px;padding:8px}.control input[type=range]{width:64px}#export{margin-left:0}#status{max-width:calc(100% - 215px);font-size:10px}#legend{right:10px;bottom:12px}}
 </style>
+<style>
+#currentLegend{position:absolute;left:18px;top:16px;padding:7px 9px;border-radius:5px;background:#fffffff0;pointer-events:none;font-variant-numeric:tabular-nums}#currentLegend div{display:flex;align-items:center;gap:7px;line-height:24px}#currentLegend div>span:first-child{width:18px;height:3px;border-radius:2px}
+#phaseLabels{position:absolute;inset:0;pointer-events:none;overflow:hidden}.phase-label{position:absolute;transform:translate(-50%,-50%);padding:2px 5px;border:1px solid;border-radius:3px;background:#fffffff0;font-size:11px;font-weight:600;white-space:nowrap}#unsolved{color:#697586;font-size:12px}
+</style>
 <div id="toolbar" aria-label="Field controls">
- <span class="pair"><button id="mode2d" aria-pressed="false">2D</button><button id="mode3d" aria-pressed="true">3D</button></span>
+ <span class="pair" data-field><button id="mode2d" aria-pressed="false">2D</button><button id="mode3d" aria-pressed="true">3D</button></span>
  <button id="fit" title="Fit view">Fit</button>
+ <span id="unsolved" hidden>Unsolved</span>
+ <label id="rotationControl" class="control" hidden>Rotation <input id="rotation" type="range" min="-180" max="180" step="1" value="0" aria-label="Mechanical rotation"><input id="rotationValue" type="number" min="-180" max="180" step="1" value="0" aria-label="Mechanical rotation in degrees"><span class="unit">°</span></label>
  <select id="section" aria-label="Section plane"><option value="axial">Axial</option><option value="longitudinal">Longitudinal</option><option value="oblique">Oblique</option></select>
  <label id="angleControl" class="control">Angle <input id="angle" type="range" min="-180" max="180" step="1" value="0" aria-label="Section angle"><input id="angleValue" type="number" step="1" value="0" aria-label="Section angle in degrees"><span class="unit">°</span></label>
  <label id="tiltControl" class="control" hidden>Tilt <input id="tilt" type="range" min="0" max="180" step="1" value="45" aria-label="Plane tilt"><input id="tiltValue" type="number" min="0" max="180" step="1" value="45" aria-label="Plane tilt in degrees"><span class="unit">°</span></label>
  <label class="control">Position <input id="offset" type="range" step="0.01" value="0" aria-label="Plane position"><input id="offsetValue" type="number" step="0.01" value="0" aria-label="Plane position in millimetres"><span class="unit">mm</span></label>
- <select id="metric" aria-label="Heatmap"><option value="flux">Flux density</option><option value="loading">Steel loading</option></select>
- <label>Max <input id="maximum" type="number" min="0.001" step="0.1" aria-label="Colour scale maximum"><span class="unit" id="maxUnit">T</span></label>
- <label title="Trace the in-plane component of B. Spacing decreases with flux density, including through air, magnets and steel."><input id="lines" type="checkbox" checked>Lines <input id="density" type="number" min="10" max="500" step="10" value="180" style="width:54px" aria-label="Streamline density"></label>
- <label><input id="air" type="checkbox">Air</label>
+ <select id="metric" data-field aria-label="Heatmap"><option value="flux">Flux density</option><option value="loading">Steel loading</option></select>
+ <label data-field>Max <input id="maximum" type="number" min="0.001" step="0.1" aria-label="Colour scale maximum"><span class="unit" id="maxUnit">T</span></label>
+ <label data-field title="Trace the in-plane component of B. Spacing decreases with flux density, including through air, magnets and steel."><input id="lines" type="checkbox" checked>Lines <input id="density" type="number" min="10" max="500" step="10" value="180" style="width:54px" aria-label="Streamline density"></label>
+ <label data-field><input id="air" type="checkbox">Air</label>
+ <label id="currentControl"><input id="current" type="checkbox">Current flow</label>
  <button id="export">PNG</button>
+ <button id="exportHtml">HTML</button>
  <button id="saveSolution">Save solution</button>
 </div>
 <main id="stage">
  <canvas id="flat" aria-label="2D motor field section" title="Drag to pan; scroll to zoom; double-click to fit" hidden></canvas>
  <div id="three" aria-label="Interactive 3D motor field section"></div>
- <canvas id="legend" width="380" height="108" aria-label="Field colour scale"></canvas>
+ <canvas id="legend" data-field width="380" height="108" aria-label="Field colour scale"></canvas>
+ <div id="phaseLabels" aria-label="Coil phases"></div>
+ <output id="currentLegend" aria-label="Phase currents" hidden></output>
  <output id="status" aria-live="polite"></output>
  <div id="busy">Loading field…</div>
 </main>

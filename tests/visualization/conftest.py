@@ -54,7 +54,11 @@ def saved_field(tmp_path):
         sectors=1,
         sector_start_rad=0,
         materials=materials,
-        coils=[dict(turns=10, phase=1, domain="body_2")],
+        coils=[dict(
+            name="winding", turns=10, phase=1, domain="body_2",
+            geometry="circle", center=[0.003, 0, 0], axis=[1, 0, 0],
+            inner=0.0005, outer=0.0015,
+        )],
     )
     for name, data in [
         ("run.json", spec),

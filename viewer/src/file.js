@@ -8,12 +8,14 @@ export async function readSolution(bytes) {
     const length = view.getUint32(8, true), start = Math.ceil((12 + length) / 4) * 4;
     const meta = JSON.parse(decoder.decode(new Uint8Array(raw, 12, length)));
     if (meta.format !== "step2torque-field" || meta.version !== 1 || !["2d", "3d"].includes(meta.mode)) throw new Error();
+    if (meta.solved === false && meta.mode !== "3d") throw new Error();
     const data = raw.slice(start), arrays = {};
     for (const [name, a] of Object.entries(meta.arrays)) {
       if (!types[a.type] || !Number.isInteger(a.offset) || !Number.isInteger(a.length) || a.offset < 0 || a.length < 0) throw new Error();
       arrays[name] = new types[a.type](data, a.offset, a.length);
     }
-    if (!arrays.points?.length || arrays.points.length % 3 || !arrays.cells?.length || arrays.cells.length % 4 || arrays.h?.length !== arrays.cells.length * 3 || arrays.material?.length !== arrays.cells.length / 4 || !arrays.bounds?.length || !arrays.nodes?.length || !meta.materials?.length) throw new Error();
+    if (!arrays.points?.length || arrays.points.length % 3 || !meta.materials?.length || !Array.isArray(meta.surfaces)) throw new Error();
+    if (meta.solved !== false && (!arrays.cells?.length || arrays.cells.length % 4 || arrays.h?.length !== arrays.cells.length * 3 || arrays.material?.length !== arrays.cells.length / 4 || !arrays.bounds?.length || !arrays.nodes?.length)) throw new Error();
     return { meta, arrays };
   } catch {
     throw new Error("Invalid step2torque solution file");

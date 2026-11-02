@@ -15,6 +15,12 @@ colourbar triangle marks the few samples above 3 T.
 python3 examples/simple/run.py
 ```
 
+Run `python3 examples/simple/run_animation.py` to write `animation.gif`: 24 frames
+over one electrical cycle (180° mechanical), looping continuously. Frames solve
+in parallel at optimized 5.5 W copper loss, with the same 0–3 T colour scale.
+
+[<img src="animation.gif" width="400" alt="Motor flux density over one electrical cycle">](animation.gif)
+
 [Geometry section](model.png)
 
 ## Sources

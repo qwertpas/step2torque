@@ -5,6 +5,8 @@ export function modelMaterial(surface) {
   const material = new THREE.MeshStandardMaterial({ color, metalness: .15, roughness: .55, side: THREE.DoubleSide });
   const pole = surface.pole;
   if (!pole) return material;
+  const rotation = { value: 0 };
+  material.userData.poleRotation = rotation;
   material.color.set(0xffffff);
   material.onBeforeCompile = shader => {
     Object.assign(shader.uniforms, {
@@ -15,15 +17,18 @@ export function modelMaterial(surface) {
       poleRadius: { value: pole.radius || 0 }, poleSign: { value: pole.sign || 1 },
       poleCount: { value: pole.count || 0 }, polePhase: { value: pole.phase || 0 },
       polePeriod: { value: pole.period }, poleStart: { value: pole.start },
+      poleRotation: rotation,
     });
     shader.vertexShader = "varying vec3 polePosition;\n" + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\npolePosition=(modelMatrix*vec4(position,1.0)).xyz;");
-    shader.fragmentShader = "varying vec3 polePosition; uniform vec3 north,south,poleVector,poleCenter; uniform float poleMode,poleRadius,poleSign,poleCount,polePhase,polePeriod,poleStart;\n" + shader.fragmentShader;
+    shader.fragmentShader = "varying vec3 polePosition; uniform vec3 north,south,poleVector,poleCenter; uniform float poleMode,poleRadius,poleSign,poleCount,polePhase,polePeriod,poleStart,poleRotation;\n" + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", `
       #include <color_fragment>
+      vec3 polePoint=polePosition;
+      polePoint.xy=mat2(cos(poleRotation),-sin(poleRotation),sin(poleRotation),cos(poleRotation))*polePoint.xy;
       float poleSide;
       if(poleMode < 1.5) {
-        vec3 p=polePosition;
+        vec3 p=polePoint;
         if(polePeriod > 0.0) {
           float a=floor((atan(p.y,p.x)-poleStart)/polePeriod)*polePeriod;
           p.xy=mat2(cos(a),-sin(a),sin(a),cos(a))*p.xy;
@@ -32,11 +37,11 @@ export function modelMaterial(surface) {
       } else {
         float polarity=poleSign;
         if(poleCount > 0.0) {
-          float a=atan(polePosition.y,polePosition.x)-polePhase+3.141592653589793/poleCount;
+          float a=atan(polePoint.y,polePoint.x)-polePhase+3.141592653589793/poleCount;
           float k=floor(mod(a,6.283185307179586)/(6.283185307179586/poleCount));
           polarity*=1.0-2.0*mod(k,2.0);
         }
-        poleSide=(length(polePosition.xy)-poleRadius)*polarity;
+        poleSide=(length(polePoint.xy)-poleRadius)*polarity;
       }
       diffuseColor.rgb=mix(south,north,step(0.0,poleSide));
     `);

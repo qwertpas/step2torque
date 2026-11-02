@@ -4,35 +4,58 @@ import { toCreasedNormals, mergeGeometries } from "three/addons/utils/BufferGeom
 import { sectionShape } from "../vendor/step-viewer/section-shape.js";
 import { createField, dot, frame, sampleSection } from "./field.js";
 import { streamlines } from "./lines.js";
-import { readSolution, writeSolution } from "./file.js";
+import { readSolution, writeSolution, base64 } from "./file.js";
 import { modelMaterial } from "./material.js";
+import { currentFlow, amps } from "./current.js";
 
 const $ = id => document.getElementById(id);
 
 async function main() {
   const bytes = Uint8Array.from(atob($("fieldData").textContent.trim()), c => c.charCodeAt(0));
   const { meta, arrays } = await readSolution(bytes);
-  const field = createField(meta, arrays);
+  const solved = meta.solved !== false;
+  const field = solved ? createField(meta, arrays) : null;
   const plane = { ...meta.plane }, palette = colorTable(meta.colors);
   const stage = $("stage"), flat = $("flat"), context = flat.getContext("2d"), textureCanvas = document.createElement("canvas");
   let mode = meta.mode, section, curves = [], edges = [], scene, renderer, camera, controls, planeMesh, texture, surfaces, capSurfaces;
   let bounds = meta.bounds;
+  let rotation = meta.angle_deg;
   let viewport, queued = false, dirty = true, density = meta.density, revision = 0, lastRenderMs = 0;
   let pending, active = false, workerReady = false, ticket = 0, interacting = false, finishTimer, settled = false, computeMs = 0;
   let textureWidth = 0, textureHeight = 0, renderWidth = 0, renderHeight = 0;
   const maxima = { flux: meta.flux_max, loading: 100 };
   maxima[meta.metric] = meta.vmax;
-  const ui = { metric: meta.metric, air: meta.air, lines: meta.lines };
+  const ui = { metric: meta.metric, air: meta.air, lines: meta.lines, current: Boolean(meta.current_flow) };
+  const flow = currentFlow(meta.coils || [], meta.box);
+  const labels = flow.children.map(loop => {
+    const coil = loop.userData.coil, element = document.createElement("span");
+    element.className = "phase-label"; element.textContent = String(coil.phase);
+    element.style.color = flow.userData.phases.find(p => p.phase === coil.phase).color;
+    $("phaseLabels").append(element);
+    const center = new THREE.Vector3();
+    for (const p of coil.points) center.add(new THREE.Vector3(...p));
+    return { element, center: center.divideScalar(coil.points.length), coil };
+  });
   const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
   const modelClip = new THREE.Plane();
   const flatView = { zoom: 1, x: 0, y: 0 };
   let drag;
 
   function settings() {
+    for (const element of document.querySelectorAll("[data-field]")) element.hidden = !solved;
+    $("rotationControl").hidden = solved;
+    $("unsolved").hidden = solved;
+    $("rotation").value = rotation;
+    if (document.activeElement !== $("rotationValue")) $("rotationValue").value = rotation;
     const kind = $("section").value;
     $("angleControl").hidden = kind === "axial";
     $("tiltControl").hidden = kind !== "oblique";
     $("air").disabled = ui.metric === "loading";
+    $("current").disabled = mode !== "3d" || !flow.children.length;
+    $("currentControl").title = flow.children.length ? "Width shows |I|; arrows show conventional current. Visible through the model." : "This file has no saved winding paths.";
+    flow.visible = mode === "3d" && ui.current && flow.children.length > 0;
+    $("currentLegend").hidden = !flow.visible;
+    $("phaseLabels").hidden = mode !== "3d" || (solved && !flow.visible);
     $("maxUnit").textContent = ui.metric === "loading" ? "%" : "T";
     $("maximum").value = maxima[ui.metric];
     const { n } = frame(plane), corners = [];
@@ -49,7 +72,8 @@ async function main() {
     const transform = new THREE.Matrix4().makeBasis(new THREE.Vector3(...u), new THREE.Vector3(...v), new THREE.Vector3(...n));
     transform.setPosition(new THREE.Vector3(...n).multiplyScalar(cut.offset)).invert();
     return capSurfaces.map(surface => {
-      const shape = sectionShape(surface.geometry, transform);
+      const local = surface.mesh ? transform.clone().multiply(surface.mesh.matrix) : transform;
+      const shape = sectionShape(surface.geometry, local);
       if (caps) {
         surface.cap.geometry.dispose();
         surface.cap.geometry = new THREE.BufferGeometry();
@@ -62,6 +86,11 @@ async function main() {
   }
 
   function redraw() {
+    if (!solved && dirty) {
+      section = { plane: { ...plane } };
+      edges = outline(plane, true);
+      dirty = false; settled = true;
+    }
     if (dirty) {
       pending = { id: ++ticket, plane: { ...plane }, bounds, resolution: interacting ? 180 : 600, preview: interacting, lines: ui.lines && !interacting, density, reference: meta.flux_max };
       dirty = false;
@@ -75,9 +104,9 @@ async function main() {
     requestAnimationFrame(() => {
       queued = false;
       const start = performance.now();
-      paintTexture(textureCanvas, section, curves, edges, ui, maxima[ui.metric], palette, meta.materials);
+      if (solved) paintTexture(textureCanvas, section, curves, edges, ui, maxima[ui.metric], palette, meta.materials);
       if (mode === "2d") drawFlat(); else drawThree();
-      drawLegend($("legend").getContext("2d"), 0, 0, 380, 108, ui.metric, maxima[ui.metric], palette);
+      if (solved) drawLegend($("legend").getContext("2d"), 0, 0, 380, 108, ui.metric, maxima[ui.metric], palette);
       revision++;
       lastRenderMs = performance.now() - start;
       $("busy").hidden = true;
@@ -91,29 +120,32 @@ async function main() {
     pending = undefined;
   }
 
-  const workerUrl = URL.createObjectURL(new Blob([__FIELD_WORKER__], { type: "text/javascript" }));
-  const worker = new Worker(workerUrl);
-  worker.onmessage = ({ data }) => {
-    if (data.ready) {
-      workerReady = true;
-      URL.revokeObjectURL(workerUrl);
-    } else {
-      active = false;
-      // Show completed previews during a sweep; only its latest full result
-      // may settle. Each image keeps its own plane, so colours stay aligned.
-      if (data.id === ticket || (data.preview && interacting)) {
-        section = { ...data.section, plane: data.plane, preview: data.preview };
-        curves = data.curves;
-        edges = outline(data.plane, true);
-        computeMs = data.computeMs;
-        settled = !data.preview;
-        redraw();
+  let worker;
+  if (solved) {
+    const workerUrl = URL.createObjectURL(new Blob([__FIELD_WORKER__], { type: "text/javascript" }));
+    worker = new Worker(workerUrl);
+    worker.onmessage = ({ data }) => {
+      if (data.ready) {
+        workerReady = true;
+        URL.revokeObjectURL(workerUrl);
+      } else {
+        active = false;
+        // Show completed previews during a sweep; only its latest full result
+        // may settle. Each image keeps its own plane, so colours stay aligned.
+        if (data.id === ticket || (data.preview && interacting)) {
+          section = { ...data.section, plane: data.plane, preview: data.preview };
+          curves = data.curves;
+          edges = outline(data.plane, true);
+          computeMs = data.computeMs;
+          settled = !data.preview;
+          redraw();
+        }
       }
-    }
-    sendSection();
-  };
-  worker.onerror = error => { $("busy").hidden = false; $("busy").textContent = error.message; };
-  worker.postMessage({ type: "init", meta, arrays });
+      sendSection();
+    };
+    worker.onerror = error => { $("busy").hidden = false; $("busy").textContent = error.message; };
+    worker.postMessage({ type: "init", meta, arrays });
+  }
 
   function finishSection() {
     if (!interacting) return;
@@ -141,6 +173,7 @@ async function main() {
     renderer.localClippingEnabled = true;
     $("three").appendChild(renderer.domElement);
     scene = new THREE.Scene();
+    scene.add(flow);
     scene.add(new THREE.HemisphereLight(0xf4f7ff, 0x505565, 1.6));
     const light = new THREE.DirectionalLight(0xffffff, 2.5);
     light.position.set(-60, -90, 140);
@@ -174,6 +207,7 @@ async function main() {
       surface.cap.matrixAutoUpdate = false;
       scene.add(surface.cap);
     }
+    if (!solved) return;
     texture = makeTexture();
     planeMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true, alphaTest: .02, depthWrite: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
     planeMesh.renderOrder = 1; scene.add(planeMesh);
@@ -196,16 +230,23 @@ async function main() {
     const tolerance = Math.hypot(...meta.box[1].map((x, i) => x - meta.box[0][i])) * 1e-6;
     modelClip.set(new THREE.Vector3(...n).multiplyScalar(side), -side * offset + tolerance);
     renderer.render(scene, camera);
+    for (const label of labels) {
+      const p = label.center.clone().project(camera);
+      label.element.style.left = (p.x + 1) / 2 * stage.clientWidth + "px";
+      label.element.style.top = (1 - p.y) / 2 * stage.clientHeight + "px";
+      label.element.hidden = p.z < -1 || p.z > 1;
+    }
   }
 
   function drawThree() {
-    const { u, v, n } = frame(section.plane), [left, bottom, right, top] = section.box;
     if (renderWidth !== stage.clientWidth || renderHeight !== stage.clientHeight) {
       renderWidth = stage.clientWidth; renderHeight = stage.clientHeight;
       renderer.setSize(renderWidth, renderHeight);
       camera.aspect = renderWidth / renderHeight;
     }
     camera.zoom = Math.min(1, camera.aspect); camera.updateProjectionMatrix();
+    if (!solved) { renderScene(); return; }
+    const { u, v, n } = frame(section.plane), [left, bottom, right, top] = section.box;
     const matrix = new THREE.Matrix4().makeBasis(new THREE.Vector3(...u), new THREE.Vector3(...v), new THREE.Vector3(...n));
     planeMesh.quaternion.setFromRotationMatrix(matrix);
     planeMesh.position.set(...n).multiplyScalar(section.plane.offset).addScaledVector(new THREE.Vector3(...u), (left + right) / 2).addScaledVector(new THREE.Vector3(...v), (bottom + top) / 2);
@@ -237,14 +278,41 @@ async function main() {
     return { ...surface, geometry };
   });
   setupThree();
+  function rotateMotor() {
+    for (const surface of surfaces) if (surface.rotating) {
+      const angle = rotation * Math.PI / 180;
+      surface.mesh.rotation.z = angle; surface.mesh.updateMatrix();
+      for (const material of [surface.mesh.material, surface.cap.material]) {
+        if (material.userData.poleRotation) material.userData.poleRotation.value = angle;
+      }
+    }
+  }
+  if (!solved) {
+    rotateMotor(); document.title = "Motor setup";
+    $("saveSolution").textContent = "Save setup";
+    $("currentLegend").title = "Preview phase currents; default 1 A per phase";
+  }
   flat.hidden = mode !== "2d"; $("three").hidden = mode !== "3d";
   $("mode2d").setAttribute("aria-pressed", mode === "2d"); $("mode3d").setAttribute("aria-pressed", mode === "3d");
   $("section").value = plane.tilt % 180 === 0 ? "axial" : plane.tilt === 90 ? "longitudinal" : "oblique";
   if ($("section").value === "axial") plane.angle = 0;
   $("metric").value = ui.metric; $("air").checked = ui.air; $("lines").checked = ui.lines;
+  $("current").checked = ui.current;
+  for (const phase of flow.userData.phases) {
+    const row = document.createElement("div"), swatch = document.createElement("span"), value = document.createElement("span");
+    swatch.style.background = phase.color;
+    value.textContent = `Phase ${phase.phase}  ${amps(phase.current_A)}`;
+    row.append(swatch, value); $("currentLegend").append(row);
+  }
   $("density").value = density;
   $("metric").querySelector('[value="loading"]').disabled = !meta.materials.some(m => m.reference_T);
   settings();
+  for (const id of ["rotation", "rotationValue"]) $(id).addEventListener("input", () => {
+    if (solved || $(id).value === "" || !$(id).validity.valid) return;
+    const value = Number($(id).value);
+    if (!Number.isFinite(value) || value < -180 || value > 180) return;
+    rotation = value; rotateMotor(); settings(); dirty = true; redraw();
+  });
   $("section").addEventListener("change", () => {
     plane.tilt = { axial: 0, longitudinal: 90, oblique: 45 }[$("section").value]; plane.offset = 0;
     if ($("section").value === "axial") plane.angle = 0;
@@ -268,7 +336,7 @@ async function main() {
     $(key).addEventListener("pointerup", finishSection);
     $(key).addEventListener("pointercancel", finishSection);
   }
-  for (const key of ["metric", "air", "lines"]) $(key).addEventListener("change", () => {
+  for (const key of ["metric", "air", "lines", "current"]) $(key).addEventListener("change", () => {
     ui[key] = key === "metric" ? $(key).value : $(key).checked;
     if (key === "lines" && ui.lines && !curves.length) dirty = true;
     settings(); redraw();
@@ -287,7 +355,7 @@ async function main() {
     mode = m; flat.hidden = m !== "2d"; $("three").hidden = m !== "3d";
     if (m === "3d" && bounds) { bounds = null; dirty = true; Object.assign(flatView, { zoom: 1, x: 0, y: 0 }); }
     $("mode2d").setAttribute("aria-pressed", m === "2d"); $("mode3d").setAttribute("aria-pressed", m === "3d");
-    redraw();
+    settings(); redraw();
   });
   function fitView() {
     if (bounds) { bounds = null; dirty = true; }
@@ -326,6 +394,20 @@ async function main() {
     } else {
       pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
       ray.setFromCamera(pointer, camera);
+      if (flow.visible) {
+        const hit = ray.intersectObjects(flow.children, true)[0];
+        if (hit) {
+          const coil = hit.object.parent.userData.coil;
+          $("status").textContent = `${coil.name} · Phase ${coil.phase} · ${amps(coil.current_A)} · ${coil.turns} turns`;
+          return;
+        }
+      }
+      if (!solved) {
+        const hit = ray.intersectObjects(surfaces.map(s => s.mesh))[0];
+        const surface = hit && surfaces.find(s => s.mesh === hit.object);
+        $("status").textContent = surface ? `${surface.name} · ${surface.kind} · ${surface.rotating ? "Rotor" : "Stator"}` : "";
+        return;
+      }
       const hit = ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(...n), -cut.offset), new THREE.Vector3());
       if (!hit) return; point = hit.toArray();
     }
@@ -333,18 +415,58 @@ async function main() {
     $("status").textContent = sample ? `${meta.materials[sample.material].name} · ${Math.hypot(sample.bx, sample.by, sample.bz).toFixed(3)} T${Number.isFinite(sample.loading) ? " · " + sample.loading.toFixed(1) + "%" : ""} · ${point.map(x => x.toFixed(1)).join(", ")} mm` : "Outside solved domain";
   });
   stage.addEventListener("pointerleave", () => { $("status").textContent = ""; });
+  function savedData() {
+    return writeSolution({ ...meta, plane: { ...plane }, metric: ui.metric, air: ui.air, lines: ui.lines, current_flow: ui.current, density, vmax: maxima[ui.metric], mode, bounds, angle_deg: solved ? meta.angle_deg : rotation }, arrays);
+  }
   $("saveSolution").addEventListener("click", async () => {
     $("saveSolution").disabled = true;
     try {
-      const saved = await writeSolution({ ...meta, plane: { ...plane }, metric: ui.metric, air: ui.air, lines: ui.lines, density, vmax: maxima[ui.metric], mode, bounds }, arrays);
+      const saved = await savedData();
       const url = URL.createObjectURL(new Blob([saved], { type: "application/octet-stream" })), link = document.createElement("a");
       link.href = url; link.download = "motor.s2t"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     } finally { $("saveSolution").disabled = false; }
+  });
+  $("exportHtml").addEventListener("click", async () => {
+    const clone = document.documentElement.cloneNode(true);
+    for (const button of clone.querySelectorAll("button")) button.disabled = false;
+    for (const id of ["three", "currentLegend", "phaseLabels"]) clone.querySelector("#" + id).replaceChildren();
+    clone.querySelector("#fieldData").textContent = base64(await savedData());
+    clone.querySelector("#busy").hidden = false;
+    const url = URL.createObjectURL(new Blob(["<!doctype html>\n" + clone.outerHTML], { type: "text/html" })), link = document.createElement("a");
+    link.href = url; link.download = "motor.html"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   $("export").addEventListener("click", async () => {
     $("export").disabled = true;
     await new Promise(resolve => requestAnimationFrame(resolve));
     try {
+      if (!solved) {
+        renderScene();
+        const canvas = document.createElement("canvas"), source = renderer.domElement;
+        canvas.width = source.width; canvas.height = source.height;
+        const ctx = canvas.getContext("2d"), scale = canvas.width / stage.clientWidth;
+        ctx.drawImage(source, 0, 0);
+        ctx.font = `600 ${11 * scale}px system-ui`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        for (const label of labels) if (!label.element.hidden) {
+          const p = label.center.clone().project(camera), text = String(label.coil.phase);
+          const x = (p.x + 1) / 2 * canvas.width, y = (1 - p.y) / 2 * canvas.height;
+          const width = ctx.measureText(text).width + 10 * scale, height = 20 * scale;
+          ctx.fillStyle = "white"; ctx.fillRect(x - width / 2, y - height / 2, width, height);
+          ctx.strokeStyle = label.element.style.color; ctx.strokeRect(x - width / 2, y - height / 2, width, height);
+          ctx.fillStyle = label.element.style.color; ctx.fillText(text, x, y);
+        }
+        ctx.font = `${12 * scale}px system-ui`; ctx.textAlign = "left";
+        if (flow.visible) for (const [i, phase] of flow.userData.phases.entries()) {
+          const y = (30 + 24 * i) * scale;
+          ctx.fillStyle = "white"; ctx.fillRect(18 * scale, y - 12 * scale, 180 * scale, 24 * scale);
+          ctx.fillStyle = phase.color; ctx.fillRect(27 * scale, y - scale, 18 * scale, 3 * scale);
+          ctx.fillStyle = "#263244"; ctx.fillText(`Phase ${phase.phase}  ${amps(phase.current_A)}`, 52 * scale, y);
+        }
+        ctx.textAlign = "right"; ctx.fillStyle = "#526173";
+        ctx.fillText(`Unsolved · ${rotation}°`, canvas.width - 20 * scale, 30 * scale);
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png")), url = URL.createObjectURL(blob), link = document.createElement("a");
+        link.href = url; link.download = "motor-setup.png"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return;
+      }
       const high = sampleSection(field, plane, 1000, bounds), canvas = document.createElement("canvas"), image = document.createElement("canvas");
       paintTexture(image, high, ui.lines ? streamlines(high, density, meta.flux_max) : [], outline(plane), ui, maxima[ui.metric], palette, meta.materials);
       canvas.width = 1600; canvas.height = Math.max(700, Math.min(1800, 1480 * image.height / image.width + 140));
@@ -361,9 +483,9 @@ async function main() {
     if (section) { if (mode === "2d") drawFlat(); else drawThree(); }
   }).observe($("toolbar"));
   window.addEventListener("resize", () => { if (section) redraw(); });
-  window.addEventListener("pagehide", () => { worker.terminate(); controls.dispose(); renderer.dispose(); }, { once: true });
+  window.addEventListener("pagehide", () => { worker?.terminate(); controls.dispose(); renderer.dispose(); }, { once: true });
   // A small read-only inspection surface also supports numeric parity checks.
-  window.motorField = { sample: field.sample, get plane() { return { ...plane }; }, get revision() { return revision; }, get renderMs() { return lastRenderMs; }, get computeMs() { return computeMs; }, get settled() { return settled && !active && !pending && !queued; }, get section() { return section; }, get lineCount() { return curves.length; }, get edgeCount() { return edges.reduce((n, e) => n + e.length / 6, 0); } };
+  window.motorField = { solved, sample: field?.sample, get rotation() { return rotation; }, get components() { return surfaces.map(s => ({ name: s.name, rotating: Boolean(s.rotating), matrix: s.mesh.matrix.toArray() })); }, get plane() { return { ...plane }; }, get revision() { return revision; }, get renderMs() { return lastRenderMs; }, get computeMs() { return computeMs; }, get settled() { return settled && !active && !pending && !queued; }, get section() { return section; }, get lineCount() { return curves.length; }, get edgeCount() { return edges.reduce((n, e) => n + e.length / 6, 0); } };
   redraw();
 }
 

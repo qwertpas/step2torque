@@ -14,6 +14,8 @@ MU0 = 4e-7 * np.pi
 
 
 class NativeField:
+    solved = True
+
     def __init__(self, solution):
         self.path = Path(getattr(solution, "path", solution)).resolve()
         required = ["run.json", "mesh.json", "result.json", "mesh.vol.gz", "best.sol"]
@@ -38,6 +40,7 @@ class NativeField:
             if isinstance(saved, dict)
             else dict(zip(self.spec["phases"], saved))
         )
+        self.coils = coil_paths(self.info["coils"], currents)
         for i, coil in enumerate(self.info["coils"]):
             unit = ng.GridFunction(ng.HCurl(self.mesh, order=0))
             unit.Load(str(self.path / f"source{i}.sol"))
@@ -55,6 +58,7 @@ class NativeField:
         """
         field = cls.__new__(cls)
         field.mesh, field.h = mesh, h
+        field.coils = []
         field.sectors = sectors
         field.spec = dict(axis=[0, 0, 1], center=[0, 0, 0], angle=0, components=[])
         field.info = dict(
@@ -254,6 +258,42 @@ class NativeField:
                 values - 0.15 * values.sum(axis=1, keepdims=True)
             ) / 0.4
         return output
+
+
+def coil_paths(coils, currents):
+    """One complete centerline per physical winding, in motor mm.
+
+    Positive traversal follows the source's right-hand axis. The saved coil
+    list already covers the full motor, including coils outside its mesh sector.
+    """
+    paths = []
+    for coil in coils:
+        axis = np.asarray(coil["axis"], float)
+        axis /= np.linalg.norm(axis)
+        u = np.cross((0, 0, 1) if abs(axis[2]) < 0.9 else (1, 0, 0), axis)
+        u /= np.linalg.norm(u)
+        v = np.cross(axis, u)
+        if coil["geometry"] == "rectangle":
+            x = (coil["inner_x"] + coil["outer_x"]) / 2
+            y = (coil["inner_y"] + coil["outer_y"]) / 2
+            xy = np.array([[-x, -y], [x, -y], [x, y], [-x, y]])
+        elif coil["geometry"] == "rounded_rectangle":
+            radius = coil.get("inner_radius", 0) + coil["width"] / 2
+            corners = []
+            for i, (sx, sy) in enumerate([(1, 1), (-1, 1), (-1, -1), (1, -1)]):
+                angle = np.linspace(i * np.pi / 2, (i + 1) * np.pi / 2, 24)
+                corners.append([sx * coil["inner_x"], sy * coil["inner_y"]] + radius * np.column_stack([np.cos(angle), np.sin(angle)]))
+            xy = np.concatenate(corners)
+        else:
+            angle = np.arange(96) * (2 * np.pi / 96)
+            radius = (coil["inner"] + coil["outer"]) / 2
+            xy = radius * np.column_stack([np.cos(angle), np.sin(angle)])
+        points = (coil["center"] + xy[:, :1] * u + xy[:, 1:] * v) * 1000
+        paths.append(dict(
+            name=coil["name"], phase=coil["phase"], turns=coil["turns"],
+            current_A=currents[coil["phase"]], points=points.tolist(),
+        ))
+    return paths
 
 
 def rotate(vectors, angle):

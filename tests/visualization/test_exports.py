@@ -138,6 +138,43 @@ def test_portable_solution_roundtrip(saved_field, tmp_path):
         Viewer(path)
 
 
+@pytest.mark.parametrize("geometry", ["circle", "rectangle", "rounded_rectangle"])
+def test_winding_paths_roundtrip(saved_field, tmp_path, geometry):
+    info = json.loads((saved_field / "mesh.json").read_text())
+    info["coils"][0].update(
+        geometry=geometry, axis=[0, -1, 0],
+        inner_x=0.0005, outer_x=0.0015, inner_y=0.001, outer_y=0.003,
+        inner_radius=0.0002, width=0.0006,
+    )
+    (saved_field / "mesh.json").write_text(json.dumps(info))
+    (saved_field / "result.json").write_text(json.dumps(dict(currents_A={"1": -2})))
+    view = Viewer(saved_field)
+    path = view.export(tmp_path / "coil.s2t")
+    meta, _ = read(path)
+    coil, = meta["coils"]
+    assert (coil["name"], coil["phase"], coil["current_A"], coil["turns"]) == (
+        "winding", 1, -2, 10,
+    )
+    points = np.array(coil["points"])
+    np.testing.assert_allclose(points.mean(axis=0), [3, 0, 0], atol=1e-12)
+    np.testing.assert_allclose(points[:, 1], 0, atol=1e-12)
+    if geometry == "circle":
+        np.testing.assert_allclose(np.linalg.norm(points - [3, 0, 0], axis=1), 1)
+    elif geometry == "rectangle":
+        np.testing.assert_allclose(points.min(axis=0), [2, 0, -2])
+        np.testing.assert_allclose(points.max(axis=0), [4, 0, 2])
+    else:
+        np.testing.assert_allclose(points.min(axis=0), [2, 0, -1.5])
+        np.testing.assert_allclose(points.max(axis=0), [4, 0, 1.5])
+    # The path's area normal follows the source axis, independently of current.
+    # The browser reverses traversal for this negative phase current.
+    area = np.cross(points, np.roll(points, -1, axis=0)).sum(axis=0)
+    assert area @ [0, -1, 0] > 0
+    reopened = Viewer(path)
+    again = reopened.export(tmp_path / "again.s2t")
+    assert read(again)[0]["coils"] == meta["coils"]
+
+
 def test_main_solution_exports(saved_field, tmp_path):
     (saved_field / "status.json").write_text('{"status":"completed"}')
     sol = Solution.open(saved_field)

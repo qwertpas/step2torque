@@ -219,6 +219,24 @@ class Motor:
             self, angle=angle, current=current, power=power, **options
         )
 
+    def render_image(self, path, *, angle=0, current=None, **options):
+        """Preview the configured motor as PNG; default current is 1 A per phase."""
+        from .visualization import Viewer
+
+        return Viewer(self, angle=angle, current=current).png(path, **options)
+
+    def render_html(self, path, *, angle=0, current=None, **options):
+        """Preview CAD, winding phases and mechanical rotation without solving."""
+        from .visualization import Viewer
+
+        return Viewer(self, angle=angle, current=current).html(path, **options)
+
+    def export(self, path, *, angle=0, current=None, **options):
+        """Export an unsolved .s2t setup; default current is 1 A per phase."""
+        from .visualization import Viewer
+
+        return Viewer(self, angle=angle, current=current).export(path, **options)
+
     def _spec(self):
         rows = []
         for c in self.components.values():

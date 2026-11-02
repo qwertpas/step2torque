@@ -12,12 +12,8 @@ class PackedField:
     def __init__(self, path):
         self.path = Path(path).resolve()
         self.meta, arrays = read(path)
+        self.solved = self.meta.get("solved", True)
         self.points = arrays["points"].reshape(-1, 3)
-        self.cells = arrays["cells"].reshape(-1, 4)
-        self.h = arrays["h"].reshape(-1, 4, 3)
-        self.cell_material = arrays["material"]
-        self.boxes = arrays["bounds"].reshape(-1, 6)
-        self.nodes = arrays["nodes"].reshape(-1, 2)
         self.materials = self.meta["materials"]
         self.bounds = np.array(self.meta["box"])
         self.sectors = self.meta["sectors"]
@@ -26,18 +22,28 @@ class PackedField:
             axis=self.meta["axis"],
             center=self.meta["world_center_mm"],
             angle=self.meta["angle_deg"],
+            components=self.meta.get("components", []),
         )
         self.rotation = np.array(self.meta["world_to_motor"])
         self.result = self.meta["result"]
+        self.coils = self.meta.get("coils", [])
         self.surfaces = [
             dict(
                 name=s["name"],
                 kind=s["kind"],
                 pole=s.get("pole"),
+                rotating=s.get("rotating", False),
                 triangles=arrays[s["array"]].reshape(-1, 3),
             )
             for s in self.meta["surfaces"]
         ]
+        if not self.solved:
+            return
+        self.cells = arrays["cells"].reshape(-1, 4)
+        self.h = arrays["h"].reshape(-1, 4, 3)
+        self.cell_material = arrays["material"]
+        self.boxes = arrays["bounds"].reshape(-1, 6)
+        self.nodes = arrays["nodes"].reshape(-1, 2)
         vertices = self.points[self.cells].astype(float)
         self.origins = vertices[:, 0]
         self.inverse = np.linalg.inv(
@@ -45,6 +51,8 @@ class PackedField:
         )
 
     def sample(self, points_mm, *, world=False):
+        if not self.solved:
+            raise ValueError("Motor is unsolved")
         points = np.asarray(points_mm, float)
         single = points.ndim == 1
         points = np.atleast_2d(points)
@@ -109,4 +117,6 @@ class PackedField:
         }
 
     def vertex_fields(self):
+        if not self.solved:
+            raise ValueError("Motor is unsolved")
         return self.h

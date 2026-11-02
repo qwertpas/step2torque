@@ -25,7 +25,7 @@ def main():
     parser.add_argument(
         "--offset", type=float, default=0, help="Signed plane offset (mm)"
     )
-    parser.add_argument("--metric", choices=("flux", "loading"), default="flux")
+    parser.add_argument("--metric", choices=("flux", "loading"))
     parser.add_argument(
         "--air", action="store_true", help="Colour air as well as solids"
     )
