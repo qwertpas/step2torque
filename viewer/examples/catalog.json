@@ -53,5 +53,10 @@
     "id": "comsol-gear",
     "label": "COMSOL axial magnetic gear",
     "path": "comsol-gear.s2t"
+  },
+  {
+    "id": "transverseflux",
+    "label": "Transverse-flux motor",
+    "path": "transverseflux.s2t"
   }
 ]

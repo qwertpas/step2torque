@@ -37,8 +37,6 @@ sol.wait()
 print(sol.torque)  # N·m about the shaft (+z).
 ```
 
-`solve()` returns immediately. `status`, `progress`, `pause()` and `resume()`
-work while it solves; `wait()` is optional.
 
 ## Benchmarks
 

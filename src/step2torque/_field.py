@@ -39,7 +39,7 @@ def solve(
     callback=None,
     checkpoint=None,
     tolerance=1e-9,
-    maxit=60,
+    maxit=200,
     stages=(1,),
     hessian_floor=0.1,
     contact=None,
