@@ -91,6 +91,7 @@ class NativeField:
                     domain=name,
                     name=component.get("name", law.get("name", name)),
                     kind=kind,
+                    rotating=component.get("rotating", law.get("rotating", False)),
                     reference_T=reference,
                 )
             )
@@ -134,7 +135,7 @@ class NativeField:
                 continue
             if key not in lookup:
                 lookup[key] = len(groups)
-                groups.append(dict(name=key[0], kind=key[1]))
+                groups.append(dict(name=key[0], kind=key[1], rotating=m["rotating"]))
             domains.append(lookup[key])
         owners = np.array(domains)[self.cell_material]
         solid = owners >= 0
@@ -170,7 +171,7 @@ class NativeField:
                 continue
             if key not in group_index:
                 group_index[key] = len(groups)
-                groups.append(dict(name=m["name"], kind=m["kind"], triangles=[]))
+                groups.append(dict(name=m["name"], kind=m["kind"], rotating=m["rotating"], triangles=[]))
         domain_group = [
             group_index.get((m["name"], m["kind"]), -1) for m in self.materials
         ]

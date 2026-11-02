@@ -7,6 +7,7 @@ import { streamlines } from "./lines.js";
 import { readSolution, writeSolution, base64 } from "./file.js";
 import { modelMaterial } from "./material.js";
 import { currentFlow, amps } from "./current.js";
+import { torqueArrow } from "./torque.js";
 
 const $ = id => document.getElementById(id);
 
@@ -14,10 +15,12 @@ async function main() {
   const bytes = Uint8Array.from(atob($("fieldData").textContent.trim()), c => c.charCodeAt(0));
   const { meta, arrays } = await readSolution(bytes);
   const solved = meta.solved !== false;
+  const torque = solved ? meta.result?.torque_Nm : undefined;
+  const hasTorque = Number.isFinite(torque);
   const field = solved ? createField(meta, arrays) : null;
   const plane = { ...meta.plane }, palette = colorTable(meta.colors);
   const stage = $("stage"), flat = $("flat"), context = flat.getContext("2d"), textureCanvas = document.createElement("canvas");
-  let mode = meta.mode, section, curves = [], edges = [], scene, renderer, camera, controls, planeMesh, texture, surfaces, capSurfaces;
+  let mode = meta.mode, section, curves = [], edges = [], scene, renderer, camera, controls, planeMesh, texture, surfaces, capSurfaces, torqueArc;
   let bounds = meta.bounds;
   let rotation = meta.angle_deg;
   let viewport, queued = false, dirty = true, density = meta.density, revision = 0, lastRenderMs = 0;
@@ -51,10 +54,14 @@ async function main() {
     $("angleControl").hidden = kind === "axial";
     $("tiltControl").hidden = kind !== "oblique";
     $("air").disabled = ui.metric === "loading";
-    $("current").disabled = mode !== "3d" || !flow.children.length;
-    $("currentControl").title = flow.children.length ? "Width shows |I|; arrows show conventional current. Visible through the model." : "This file has no saved winding paths.";
-    flow.visible = mode === "3d" && ui.current && flow.children.length > 0;
+    $("current").disabled = mode !== "3d" || (!flow.children.length && !hasTorque);
+    $("currentControl").title = "Winding width shows |I|; arrows show current and torque direction.";
+    const showFlow = mode === "3d" && ui.current;
+    flow.visible = showFlow && flow.children.length > 0;
+    if (torqueArc) torqueArc.visible = showFlow;
     $("currentLegend").hidden = !flow.visible;
+    $("torqueLegend").hidden = !showFlow || !hasTorque;
+    $("resultLegend").hidden = !showFlow || (!hasTorque && !flow.children.length);
     $("phaseLabels").hidden = mode !== "3d" || (solved && !flow.visible);
     $("maxUnit").textContent = ui.metric === "loading" ? "%" : "T";
     $("maximum").value = maxima[ui.metric];
@@ -174,6 +181,8 @@ async function main() {
     $("three").appendChild(renderer.domElement);
     scene = new THREE.Scene();
     scene.add(flow);
+    torqueArc = torqueArrow(torque, surfaces);
+    if (torqueArc) scene.add(torqueArc);
     scene.add(new THREE.HemisphereLight(0xf4f7ff, 0x505565, 1.6));
     const light = new THREE.DirectionalLight(0xffffff, 2.5);
     light.position.set(-60, -90, 140);
@@ -298,6 +307,7 @@ async function main() {
   if ($("section").value === "axial") plane.angle = 0;
   $("metric").value = ui.metric; $("air").checked = ui.air; $("lines").checked = ui.lines;
   $("current").checked = ui.current;
+  if (hasTorque) $("torqueLegend").textContent = `Torque ${torque.toPrecision(3)} N·m`;
   for (const phase of flow.userData.phases) {
     const row = document.createElement("div"), swatch = document.createElement("span"), value = document.createElement("span");
     swatch.style.background = phase.color;
@@ -429,7 +439,7 @@ async function main() {
   $("exportHtml").addEventListener("click", async () => {
     const clone = document.documentElement.cloneNode(true);
     for (const button of clone.querySelectorAll("button")) button.disabled = false;
-    for (const id of ["three", "currentLegend", "phaseLabels"]) clone.querySelector("#" + id).replaceChildren();
+    for (const id of ["three", "currentLegend", "torqueLegend", "phaseLabels"]) clone.querySelector("#" + id).replaceChildren();
     clone.querySelector("#fieldData").textContent = base64(await savedData());
     clone.querySelector("#busy").hidden = false;
     const url = URL.createObjectURL(new Blob(["<!doctype html>\n" + clone.outerHTML], { type: "text/html" })), link = document.createElement("a");

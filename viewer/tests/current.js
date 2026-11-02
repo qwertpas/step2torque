@@ -101,7 +101,6 @@ try {
   assert.equal(await page.locator("#currentLegend").innerText(), "Phase 1 +0.0276 A\nPhase 3 -2.09 A\nPhase 2 +2.07 A");
   await page.screenshot({ path: path.join(output, "mosrac.png") });
   await page.goto("file://" + path.join(path.dirname(file), "double-sphere.html")); await settle();
-  assert.equal(await page.locator("#current").isEnabled(), false);
   assert.equal(await page.locator("#currentLegend").isVisible(), false);
   assert.deepEqual(errors, []); assert.deepEqual(network, []);
   await fs.writeFile(path.join(output, "report.json"), JSON.stringify({ overlap, errors, network }, null, 2) + "\n");
