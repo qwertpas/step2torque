@@ -1,6 +1,5 @@
-The section implementation in vendor/step-viewer/section-shape.js comes from
-https://github.com/qwertpas/step-viewer/blob/main/src/section-shape.js,
-retrieved on 2026-11-01, and is reused from the reference supplied for this work.
+viewer/vendor/step-viewer/section-shape.js is adapted from
+https://github.com/qwertpas/step-viewer/blob/main/src/section-shape.js.
 
 Three.js and three-mesh-bvh are distributed under their MIT licenses. Their
 license notices are retained in the bundled JavaScript.

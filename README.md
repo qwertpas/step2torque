@@ -41,9 +41,7 @@ sol.render_html("motor.html")
 sol.export("motor.s2t")
 ```
 
-Send the HTML to open directly in a browser, or load the single `.s2t` file in
-the [browser viewer](https://qwertpas.github.io/step2torque/). Choose a built-in
-example or open a local solution; files stay in your browser.
+Open the HTML directly, or load the `.s2t` file in the browser viewer.
 
 Use `plane=Plane.axial(z=0)` or `Plane.longitudinal(angle=30)` to select a section
 in Python (`from step2torque import Plane`). Distances are mm relative to the

@@ -13,4 +13,8 @@ src/step2torque/_assembly_version.py
 AGENTS.md
 *.sol
 *.vol.gz
+*.s2t
+!viewer/examples/*.s2t
+/field.png
+/motor.html
 
